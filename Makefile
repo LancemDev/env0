@@ -15,6 +15,8 @@ endif
 # Clean leading 'v' from version string if present
 CLEAN_VERSION := $(patsubst v%,%,$(TARGET_VERSION))
 
+# env0 collects no telemetry, so there is no key to inject here.
+LDFLAGS := -s -w
 
 all: build
 
