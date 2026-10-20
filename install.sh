@@ -2,12 +2,12 @@
 # Universal installer script for env0 (https://github.com/LancemDev/env0)
 #
 # Usage:
-#   curl -fsSL https://github.com/LancemDev/env0/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/LancemDev/env0/main/install.sh | sh
 #
 # Environment variables:
 #   VERSION      - target version to install (e.g. "0.1.0" or "latest", default: "latest")
 #   INSTALL_DIR  - target directory for binary (default: /usr/local/bin or ~/.local/bin)
-#   ENV0_REPO     - GitHub repository (default: LancemDev/env0)
+#   ENV0_REPO    - GitHub repository (default: LancemDev/env0)
 
 set -eu
 
