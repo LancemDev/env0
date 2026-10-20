@@ -16,7 +16,7 @@ import { promptNewItem } from './newitem.js';
 
 const sideEl = $('#side');
 const panelEl = $('#envpanel');
-const listEl = $('#envpanel-list');
+const envListEl = $('#envpanel-list');
 const btnEnv = $('#btn-env');
 const btnNew = $('#envpanel-new');
 const countEl = $('#envpanel-count');
@@ -32,21 +32,21 @@ export const isEnvPanelOpen = () => open;
  * refreshEnvFiles reads the list of .env files and draws it.
  */
 export async function refreshEnvFiles() {
-  if (!listEl) return;
+  if (!envListEl) return;
   let files = [];
   try {
     const j = await api('/api/env/files');
     files = j.files || [];
   } catch (e) {
-    listEl.replaceChildren();
+    envListEl.replaceChildren();
     const err = document.createElement('div');
     err.className = 'envpanel-empty';
     err.textContent = 'Could not read the .env files: ' + e.message;
-    listEl.appendChild(err);
+    envListEl.appendChild(err);
     return;
   }
 
-  listEl.replaceChildren();
+  envListEl.replaceChildren();
 
   if (countEl) {
     countEl.textContent = files.length === 1 ? '1 file' : files.length + ' files';
@@ -56,7 +56,7 @@ export async function refreshEnvFiles() {
     const empty = document.createElement('div');
     empty.className = 'envpanel-empty';
     empty.textContent = 'No .env files in this workspace yet.';
-    listEl.appendChild(empty);
+    envListEl.appendChild(empty);
     return;
   }
 
@@ -84,7 +84,7 @@ export async function refreshEnvFiles() {
     row.appendChild(dir);
     row.appendChild(count);
     row.addEventListener('click', () => openFile(f.path));
-    listEl.appendChild(row);
+    envListEl.appendChild(row);
   }
 }
 
