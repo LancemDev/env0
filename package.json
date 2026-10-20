@@ -1,0 +1,12 @@
+{
+  "name": "env0",
+  "version": "0.1.19",
+  "type": "module",
+  "private": true,
+  "description": "A fast, local-first code navigator with a built-in .env editor",
+  "scripts": {
+    "build": "node ./scripts/build-web.js",
+    "check": "node ./scripts/check-web.js",
+    "test": "node --test \"web/src/*.test.js\""
+  }
+}

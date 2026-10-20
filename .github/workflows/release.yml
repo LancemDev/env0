@@ -1,0 +1,97 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag to release (e.g. v0.2.0)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Release env0
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Bundle Web Assets
+        run: |
+          node ./scripts/build-web.js
+
+      - name: Determine Version
+        id: get_version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            TAG="${{ github.event.inputs.version }}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          VER="${TAG#v}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VER" >> $GITHUB_OUTPUT
+          # Ensure VERSION file matches the release version
+          echo "$VER" > VERSION
+
+      - name: Build Cross-Platform Binaries
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
+        run: |
+          mkdir -p dist
+          LDFLAGS="-s -w"
+          TARGETS="
+          linux/amd64 linux/arm64 linux/arm linux/386 linux/riscv64
+          darwin/amd64 darwin/arm64
+          windows/amd64 windows/arm64 windows/386
+          freebsd/amd64 freebsd/arm64 openbsd/amd64 openbsd/arm64 netbsd/amd64
+          "
+          for t in $TARGETS; do
+            os=${t%/*}
+            arch=${t#*/}
+            ext=""
+            [ "$os" = "windows" ] && ext=".exe"
+            name="env0-${VERSION}-${os}-${arch}${ext}"
+            printf "Building %-28s ... " "$name"
+            CGO_ENABLED=0 GOOS="$os" GOARCH="$arch" \
+              go build -trimpath -ldflags="$LDFLAGS" -o "dist/$name" .
+            printf "done (%s)\n" "$(du -h "dist/$name" | cut -f1)"
+          done
+
+      - name: Generate Checksums
+        run: |
+          cd dist
+          sha256sum env0-* > checksums.txt
+          cat checksums.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_version.outputs.tag }}
+          name: ${{ steps.get_version.outputs.tag }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            dist/env0-*
+            dist/checksums.txt

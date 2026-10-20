@@ -1,0 +1,33 @@
+dist/
+bench-repos/
+env0
+env0.exe
+*.test
+*.prof
+
+# Go
+*.out
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+build/
+web/app.js
+web/workbench.js
+web/vendor/*.min.js
+web/vendor/*.min.js.gz
+
+# Logs
+*.log
+
+# The environment files of this repository are examples, not secrets.
+.env
+.env.local
+.env.*.local
