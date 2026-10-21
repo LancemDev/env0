@@ -46,23 +46,49 @@ export const autosaveDelay = () => {
 // The pending write for each doc, so switching tabs does not lose a save.
 const pending = new WeakMap();
 
+// The doc whose rows are on screen, so the table is only rebuilt when a
+// different file is shown.
+let shownDoc = null;
+
+// What a reader sees of an entry. The original line text (raw) is left out:
+// it changes on every write without changing anything on screen.
+const ENTRY_FIELDS = ['type', 'key', 'value', 'quote', 'export', 'tail', 'text'];
+
+function sameEntries(a, b) {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    for (const f of ENTRY_FIELDS) {
+      if ((a[i][f] || '') !== (b[i][f] || '')) return false;
+    }
+  }
+  return true;
+}
+
 /**
  * syncEnvView shows the .env editor when the active tab holds a .env file,
  * and takes it away when it does not.
  */
 export function syncEnvView() {
   const d = doc_();
-  const want = d && d.isEnv && !d.isEditing && !d.envRaw ? d : null;
+  // A diff asked for on a .env tab takes the screen; the table steps aside.
+  const want = d && d.isEnv && !d.isEditing && !d.envRaw && !d.diffMode ? d : null;
 
   if (envViewEl) envViewEl.hidden = !want;
   if (want) {
     vp.hidden = true;
     if (envFileEl) envFileEl.textContent = want.path;
     loadEnvDoc(want);
-    renderEnvTable(want);
-  } else if (d && d.isEnv && d.envRaw) {
-    // The raw view is the code viewport; make sure it is on screen.
-    vp.hidden = false;
+    // Redraw only for a different tab. This runs on every tab activation,
+    // including the reload that follows each autosave, and a redraw would
+    // take the cursor out of the box being typed in.
+    if (shownDoc !== want || !envRows?.childElementCount) renderEnvTable(want);
+    shownDoc = want;
+  } else {
+    shownDoc = null;
+    if (d && d.isEnv && d.envRaw) {
+      // The raw view is the code viewport; make sure it is on screen.
+      vp.hidden = false;
+    }
   }
 
   // The switch between the two views lives above the editor, so it stays
@@ -84,12 +110,22 @@ async function loadEnvDoc(d) {
   d.envLoaded = true;
   try {
     const j = await api('/api/env/get', { path: d.path });
-    // The tab may have been closed or pointed elsewhere while this was in
-    // flight.
-    if (doc_() !== d) return;
-    d.envEntries = j.entries || [];
+    // Typed into while this was in flight: what is in the editor is newer
+    // than what was read, and the autosave will write it.
+    if (d.envDirty || d.envSaving) return;
+    const fresh = j.entries || [];
     d.envTrailingNewline = j.trailingNewline !== false;
-    d.envDirty = false;
+
+    if (d.envEntries && sameEntries(d.envEntries, fresh)) {
+      // The file says what the editor already shows -- usually because the
+      // editor just wrote it. Keep the entries the rows are bound to, and
+      // only take the new original text of each line.
+      fresh.forEach((e, i) => { d.envEntries[i].raw = e.raw; });
+      updateEnvStatus(d);
+      return;
+    }
+
+    d.envEntries = fresh;
     if (doc_() === d && !envViewEl?.hidden) renderEnvTable(d);
     updateEnvStatus(d);
   } catch (e) {
@@ -434,4 +470,6 @@ export function initEnvView() {
   on('tabs:cleared', () => syncEnvView());
   // The text editor takes over the file, so the .env table steps aside.
   on('edit:mode', () => syncEnvView());
+  // So does a diff, and the table comes back when the diff is closed.
+  on('diff:mode', () => syncEnvView());
 }

@@ -111,7 +111,9 @@ export async function openFile(path, opts = {}) {
     let initialDismissed = false;
 
     if (hasDiff) {
-      if (wantsSource && !j.deleted) {
+      // A .env file opens in the .env editor, not its diff, unless the diff
+      // was asked for; the Diff switch is still there.
+      if ((wantsSource || (isEnvPath(path) && !wantsDiff)) && !j.deleted) {
         initialDiffMode = null;
         initialDismissed = true;
         initialOpenedInDiff = false;
@@ -346,6 +348,19 @@ export async function reloadOpenTabs({ onlyIfChanged = false } = {}) {
       d.lines[j.start + k] = j.lines[k];
     }
     d.lsp = j.lsp || { state: 'off', server: '' };
+
+    if (keep.isEnv) {
+      /* A .env tab is updated in place rather than replaced. The .env editor
+         keeps its state on the doc -- the parsed entries, a pending autosave,
+         changes not yet written -- and its rows are bound to it, so a new doc
+         would drop all of that mid-edit. Its own autosave is the most common
+         reason for the reload in the first place. */
+      Object.assign(keep, d);
+      // Read the file again unless the editor holds changes not yet on disk.
+      if (!keep.envDirty && !keep.envSaving) keep.envLoaded = false;
+      if (j.refine) refineChunk(keep, tgt.start / CHUNK);
+      continue;
+    }
 
     S.tabs[idx] = d;
     if (j.refine) refineChunk(d, tgt.start / CHUNK);

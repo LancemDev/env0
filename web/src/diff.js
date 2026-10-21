@@ -5,7 +5,7 @@
 // Unlike the code viewport this is not virtualized -- a file's own diff is
 // bounded in size, so a plain DOM render is simple and fast enough.
 import { $, S, doc_, esc, api, MOD } from './state.js';
-import { on } from './bus.js';
+import { on, emit } from './bus.js';
 import { syncPreview } from './markdown.js';
 import { setStatusNote, updateStatus } from './status.js';
 import { wordAtPoint } from './cursor.js';
@@ -88,6 +88,7 @@ export async function setDiffMode(mode) {
   syncPreview(); // markdown preview and diff view are mutually exclusive
   syncDiffView();
   updateStatus();
+  emit('diff:mode', { doc: d, mode });
 }
 
 async function drawDiff(d, force = false) {
