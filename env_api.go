@@ -177,7 +177,7 @@ func (s *Server) handleEnvCreate(w http.ResponseWriter, r *http.Request) {
 // same directory, then renames it over the target.
 func writeFileAtomicMode(path string, data []byte, mode os.FileMode) error {
 	dir := filepath.Dir(path)
-	tmp, err := os.CreateTemp(dir, ".env0-*")
+	tmp, err := os.CreateTemp(dir, ".lx8-*")
 	if err != nil {
 		return err
 	}

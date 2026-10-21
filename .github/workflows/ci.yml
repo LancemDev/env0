@@ -30,8 +30,8 @@ jobs:
       - name: Bundle web assets
         run: node ./scripts/build-web.js
 
-      - name: Build env0
-        run: go build -trimpath -o env0 .
+      - name: Build lx8
+        run: go build -trimpath -o lx8 .
 
       - name: Run tests
         run: go test -v ./...

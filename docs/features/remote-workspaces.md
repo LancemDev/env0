@@ -1,6 +1,6 @@
 # Remote Workspaces & Cloud Inspection
 
-env0 is architected from the ground up as a remote-first code reading environment. It allows you to run a single binary on any remote server, cloud instance, Docker container, or CI runner and browse the codebase directly in your local desktop browser without SSH keys, port forwarding setups, or heavy remote extension daemons.
+lx8 is architected from the ground up as a remote-first code reading environment. It allows you to run a single binary on any remote server, cloud instance, Docker container, or CI runner and browse the codebase directly in your local desktop browser without SSH keys, port forwarding setups, or heavy remote extension daemons.
 
 ---
 
@@ -8,14 +8,14 @@ env0 is architected from the ground up as a remote-first code reading environmen
 
 Modern software development frequently takes place across cloud instances (AWS EC2, GCP Compute Engine), remote containers, Kubernetes pods, and devboxes. Traditional remote development setups (such as VS Code Remote-SSH, remote X11 forwarding, or VNC) require multi-step authentication setups, background server daemon installations, high CPU overhead, and significant network bandwidth.
 
-env0 simplifies remote code inspection into a single shell command. Because the entire application—Go backend, HTTP server, assets, and frontend—is compiled into one static ~3.5 MB binary with zero external dependencies, you can copy env0 to any remote Linux, macOS, or BSD machine and spin it up instantly. Connecting via Tailscale, WireGuard, private VPCs, or reverse proxies gives you a fluid, graphical code inspection console in your browser.
+lx8 simplifies remote code inspection into a single shell command. Because the entire application—Go backend, HTTP server, assets, and frontend—is compiled into one static ~3.5 MB binary with zero external dependencies, you can copy lx8 to any remote Linux, macOS, or BSD machine and spin it up instantly. Connecting via Tailscale, WireGuard, private VPCs, or reverse proxies gives you a fluid, graphical code inspection console in your browser.
 
 ---
 
 ## Key Capabilities
 
 - **Zero Remote Daemons**: No Node.js runtime, no npm packages, no Electron layers, and no background extension churn on the remote machine.
-- **Single Port Operation**: env0 serves all assets, JSON APIs, and search queries over a single HTTP port (default `7777`).
+- **Single Port Operation**: lx8 serves all assets, JSON APIs, and search queries over a single HTTP port (default `7777`).
 - **Flexible Network Binding**:
   - Bind to localhost for private tunnels (`-host 127.0.0.1`).
   - Bind to all interfaces for Tailscale/VPN access (`-host 0.0.0.0`).
@@ -24,38 +24,38 @@ env0 simplifies remote code inspection into a single shell command. Because the 
   - **Path Traversal Protection**: Enforces strict path sandboxing; requests attempting to escape the workspace root using `../` or symlink cycle attacks are immediately blocked.
   - **DNS Rebinding Defense**: Inspects incoming HTTP `Host` headers to prevent cross-site scripting attacks via malicious DNS records.
   - **Agent Security Restrictions**: Agent editing commands are permitted only over direct IP addresses or `localhost`. Access over external hostnames or tunnel proxies automatically disables agent modifications to protect remote machines.
-- **Direct Terminal Ergonomics**: Launch env0 targeting specific files or line numbers directly from the command line:
-  - `env0` (opens the [review workbench](workbench.md); `env0 .` opens the current directory)
-  - `env0 ~/projects/kernel` (opens specified repository)
-  - `env0 main.go:42` (opens directly to line 42)
-- **Built-in Self-Updater (`env0 --update`)**: Checks GitHub releases and seamlessly upgrades the single binary in place.
+- **Direct Terminal Ergonomics**: Launch lx8 targeting specific files or line numbers directly from the command line:
+  - `lx8` (opens the [review workbench](workbench.md); `lx8 .` opens the current directory)
+  - `lx8 ~/projects/kernel` (opens specified repository)
+  - `lx8 main.go:42` (opens directly to line 42)
+- **Built-in Self-Updater (`lx8 --update`)**: Checks GitHub releases and seamlessly upgrades the single binary in place.
 
 ---
 
 ## Developer Workflows & Setup Patterns
 
 ### 1. Cloud Devbox via Tailscale or WireGuard
-Run env0 on your cloud instance bound to all interfaces:
+Run lx8 on your cloud instance bound to all interfaces:
 ```bash
-env0 -host 0.0.0.0 -port 7777 ~/work/repo
+lx8 -host 0.0.0.0 -port 7777 ~/work/repo
 ```
 Open your local browser to `http://100.x.y.z:7777` (your machine's private Tailscale IP). You get full code reading, fuzzy search, and diff inspection with zero SSH lag.
 
 ### 2. Ephemeral Docker Container Inspection
 Inspect code inside a running container or test environment:
 ```bash
-docker run -p 7777:7777 -v $(pwd):/workspace env0:latest -host 0.0.0.0 /workspace
+docker run -p 7777:7777 -v $(pwd):/workspace lx8:latest -host 0.0.0.0 /workspace
 ```
 
 ### 3. CI/CD Runner Debugging
-When a build or test suite fails on a remote CI runner, download env0, run it in the background, and inspect generated artifacts, failure logs, and git status directly in your browser.
+When a build or test suite fails on a remote CI runner, download lx8, run it in the background, and inspect generated artifacts, failure logs, and git status directly in your browser.
 
 ### 4. Reverse Proxy & Subpath Hosting (`-base-path`)
-When hosting env0 behind a reverse proxy (Nginx, Traefik, Caddy), an API gateway, or a multi-tenant cloud platform (such as PR review pods at `https://tenant.env0.ai/rev-123/` or internal portals at `https://corp.internal/tools/env0/`), env0 is served from a URL subpath rather than the root domain (`/`).
+When hosting lx8 behind a reverse proxy (Nginx, Traefik, Caddy), an API gateway, or a multi-tenant cloud platform (such as PR review pods at `https://reviews.example.com/rev-123/` or internal portals at `https://corp.internal/tools/lx8/`), lx8 is served from a URL subpath rather than the root domain (`/`).
 
-Run env0 with `-base-path`:
+Run lx8 with `-base-path`:
 ```bash
-env0 -base-path /rev-123/ -host 0.0.0.0 -port 7777 ~/workspace
+lx8 -base-path /rev-123/ -host 0.0.0.0 -port 7777 ~/workspace
 ```
 
 **When to use `-base-path`:**

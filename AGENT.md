@@ -1,6 +1,6 @@
 # Operational Guidelines for AI Agents
 
-Welcome agent! This document contains essential instructions and workflows for working productively and quickly in `env0`.
+Welcome agent! This document contains essential instructions and workflows for working productively and quickly in `lx8`.
 
 ---
 
@@ -15,7 +15,7 @@ To keep iteration fast and avoid unnecessary delays:
 | :--- | :--- | :--- | :--- |
 | **Frontend Check** | `make web-check` or `npm run check` | **<100ms** | Validates JS syntax, relative imports, and runs frontend tests. |
 | **Frontend Bundle** | `make web` or `node scripts/build-web.js` | **<50ms** | Run whenever modifying files under `web/src/`. |
-| **Build Binary** | `make build` | **~2s** | Bundles frontend (`web/app.js`) and compiles local `./env0` binary. |
+| **Build Binary** | `make build` | **~2s** | Bundles frontend (`web/app.js`) and compiles local `./lx8` binary. |
 | **Fast Verification** | `make check` or `go test -short .` | **~7s** | Runs frontend validation, asset bundling, and fast Go unit tests. |
 | **Full Test Suite** | `make test` or `go test .` | **~20s** | Run once all changes are done; iterate until all tests pass before concluding. |
 
@@ -40,9 +40,9 @@ To keep iteration fast and avoid unnecessary delays:
 
 ## 3. Core Architectural Tenets
 
-1. **Reads First, Edits via Harness**: `env0` is an ultra-fast code reader and reviewer. File modifications are delegated to external coding harnesses (`agent.go`, `thread.go`), never authored directly to disk by `env0` (with the exception of explicit user-initiated Git operations in the sidebar).
+1. **Reads First, Edits via Harness**: `lx8` is an ultra-fast code reader and reviewer. File modifications are delegated to external coding harnesses (`agent.go`, `thread.go`), never authored directly to disk by `lx8` (with the exception of explicit user-initiated Git operations in the sidebar).
 2. **Zero Runtime Dependencies**: The output must remain a single, standalone static binary. No CGO, no Node.js runtime requirement for the user, no external databases.
-3. **No Workspace Litter**: `env0` never creates `.env0/` folders or cache files inside a workspace tree. Persistent configuration and thread transcripts live in `$XDG_CONFIG_HOME/env0/` or `~/.env0/`; per-workspace session files (PR review drafts) and the workbench store live in `$XDG_STATE_HOME/env0/` or `~/.env0/`.
+3. **No Workspace Litter**: `lx8` never creates `.lx8/` folders or cache files inside a workspace tree. Persistent configuration and thread transcripts live in `$XDG_CONFIG_HOME/lx8/` or `~/.lx8/`; per-workspace session files (PR review drafts) and the workbench store live in `$XDG_STATE_HOME/lx8/` or `~/.lx8/`.
 4. **Fast & Non-Blocking**: Operations must remain responsive. All background tasks, network calls, and git operations must respect timeouts and set `GIT_TERMINAL_PROMPT=0`.
 
 ---
@@ -56,7 +56,7 @@ To keep iteration fast and avoid unnecessary delays:
   - User features -> [`docs/features/`](docs/features/)
 - **Keeping Tips & Tricks Updated**: Whenever rolling out an important user-facing feature, shortcut, command, or workflow improvement:
   - Add a concise, helpful tip entry to both:
-    1. [`../web/public/tips.json`](../web/public/tips.json): Served publicly at `https://github.com/LancemDev/env0/tips.json`.
+    1. [`../web/public/tips.json`](../web/public/tips.json): Served publicly at `https://github.com/LancemDev/lx8/tips.json`.
     2. [`web/src/tips-util.js`](web/src/tips-util.js): Built-in offline fallback in `DEFAULT_TIPS`.
   - Tips use the standard schema:
     ```json

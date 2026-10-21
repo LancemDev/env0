@@ -1,16 +1,16 @@
 # Git Awareness, Diffing & Stage/Commit/Push/Pull
 
-This document describes the design and implementation of env0's git integration engine ([`git.go`](../../git.go)), its diff-rendering frontend ([`web/src/diff.js`](../../web/src/diff.js)), and the sidebar git panel that stages, commits, pushes, and pulls ([`web/src/gitpanel.js`](../../web/src/gitpanel.js), [`web/src/tree.js`](../../web/src/tree.js)).
+This document describes the design and implementation of lx8's git integration engine ([`git.go`](../../git.go)), its diff-rendering frontend ([`web/src/diff.js`](../../web/src/diff.js)), and the sidebar git panel that stages, commits, pushes, and pulls ([`web/src/gitpanel.js`](../../web/src/gitpanel.js), [`web/src/tree.js`](../../web/src/tree.js)).
 
 ## 1. Zero-Dependency Shell-Out Architecture
 
-env0 avoids heavy third-party Go git libraries (such as `go-git`, which can consume large amounts of memory re-parsing packfiles, or `libgit2`, which requires CGO).
+lx8 avoids heavy third-party Go git libraries (such as `go-git`, which can consume large amounts of memory re-parsing packfiles, or `libgit2`, which requires CGO).
 
-Instead, env0 adheres to a Pure Shell-Out Architecture:
+Instead, lx8 adheres to a Pure Shell-Out Architecture:
 
 - Shells out directly to the host `git` binary, for reads (`status`, `diff`, `merge-base`) and, since the git panel, for writes (`add`, `reset`, `commit`, `push`, `fetch`, `merge --ff-only`, `reset --hard`, `rebase --abort`, `merge --abort`).
 - Status and diffing themselves never stage, commit, or change refs or the index — that half of the engine is still purely read-only. The git panel's write endpoints (`/api/git/stage`, `unstage`, `commit`, `push`, `pull`, `abort`) are the only exception, and every one of them fires exactly once per explicit click; nothing runs on a timer or in response to a file change. See §9.
-- A dispatched coding harness ([Harness Editing & Agent Dispatch](agent-editing.md)) can still write anything else in the workspace — including, via **Commit with AI**, the *text* of a commit message — but never touches git state itself, with one opt-in exception: **Rebase/Merge with AI** (§9), which the user starts explicitly after a pull can't fast-forward. Otherwise only env0's own git-panel endpoints touch git state.
+- A dispatched coding harness ([Harness Editing & Agent Dispatch](agent-editing.md)) can still write anything else in the workspace — including, via **Commit with AI**, the *text* of a commit message — but never touches git state itself, with one opt-in exception: **Rebase/Merge with AI** (§9), which the user starts explicitly after a pull can't fast-forward. Otherwise only lx8's own git-panel endpoints touch git state.
 - Zero disk footprint: holds all status and diff structures in volatile memory on the `Index` (`Node.Status`, `Node.Staged`).
 - Graceful degradation: if `git` is not installed, or if the opened directory is not a git repository, git features degrade silently without warnings or errors.
 - Can be disabled explicitly using the `-no-git` CLI flag.
@@ -19,7 +19,7 @@ Instead, env0 adheres to a Pure Shell-Out Architecture:
 
 On large repositories, running `git status` can take 50-100 milliseconds. Running this serially during startup would delay index readiness.
 
-env0 runs `git status` concurrently alongside the filesystem walk:
+lx8 runs `git status` concurrently alongside the filesystem walk:
 
 ```go
 gsCh := make(chan map[string]string, 1)
@@ -34,7 +34,7 @@ gs := <-gsCh
 
 ### Git Command Specification
 
-env0 invokes:
+lx8 invokes:
 
 ```bash
 git status --porcelain=v2 -z
@@ -102,7 +102,7 @@ When viewing a file, the editor displays green, blue, and red markers in the lin
 
 ### Split & Unified Views (`web/src/diff.js`)
 
-The active tab gets a `Source | Diff` switch next to the tab bar (`#diff-switch`, shown only when `d.diffAvailable`) whenever the open file is modified in a git repo. `#diff-source` and `#diff-btn` each show their own view, and hovering the Diff half opens the Split/Unified menu; `Cmd/Ctrl+D` toggles the same thing, resuming whichever layout was used last (`localStorage['env0.diffLayout']`, default `split`). Diff view and the Markdown preview are mutually exclusive — entering one hides the other — and each tab remembers its own state on `d.diffMode` (`'split' | 'unified' | null`).
+The active tab gets a `Source | Diff` switch next to the tab bar (`#diff-switch`, shown only when `d.diffAvailable`) whenever the open file is modified in a git repo. `#diff-source` and `#diff-btn` each show their own view, and hovering the Diff half opens the Split/Unified menu; `Cmd/Ctrl+D` toggles the same thing, resuming whichever layout was used last (`localStorage['lx8.diffLayout']`, default `split`). Diff view and the Markdown preview are mutually exclusive — entering one hides the other — and each tab remembers its own state on `d.diffMode` (`'split' | 'unified' | null`).
 
 Unlike the main code view, the diff is **not** rendered through the virtualized `#rows` viewport. A single file's diff is small (bounded by the size of that one file), so `diff.js` renders it as plain DOM into a dedicated `#diffview` overlay — the same overlay-over-`#viewport` pattern the Markdown preview uses (see [Markdown Preview](markdown.md)), just with its own content:
 
@@ -116,7 +116,7 @@ Both layouts share the same hunk-header, line-number, marker, and code-cell buil
 
 ## 5. Real-Time Streaming & Adaptive Monitoring Engine
 
-To keep git statuses, sidebar badges, and editor gutter diff indicators in sync without requiring manual page reloads or full workspace re-indexing, env0 uses a hybrid real-time monitoring engine (`git_watcher.go` and `web/src/gitstream.js`).
+To keep git statuses, sidebar badges, and editor gutter diff indicators in sync without requiring manual page reloads or full workspace re-indexing, lx8 uses a hybrid real-time monitoring engine (`git_watcher.go` and `web/src/gitstream.js`).
 
 ### Design Constraints: Small vs. Massive Repositories
 
@@ -124,14 +124,14 @@ To keep git statuses, sidebar badges, and editor gutter diff indicators in sync 
 | :--- | :--- | :--- | :--- |
 | **Recursive FS Watcher (`inotify`)** | Fast, low RAM | Exhausts OS watch descriptors (`max_user_watches`), high memory footprint, breaks across symlinks / mount points | **Rejected** |
 | **Fixed High-Frequency Polling** | Instant updates (~6ms) | Heavy CPU and battery drain (100k+ file `git status` takes 150ms-1s) | **Rejected** |
-| **env0 Hybrid Adaptive Engine** | Sub-millisecond latency, zero RAM overhead | Sub-millisecond on CLI git actions; worktree polling throttled dynamically; CPU usage bounded $\le 10\%$ | **Adopted** |
+| **lx8 Hybrid Adaptive Engine** | Sub-millisecond latency, zero RAM overhead | Sub-millisecond on CLI git actions; worktree polling throttled dynamically; CPU usage bounded $\le 10\%$ | **Adopted** |
 
 ### Dual-Layer Hybrid Architecture
 
 1. **Sub-millisecond Metadata Stat-Checking (Fast Path)**
-   - Every 1 second, env0 checks the `os.Stat` timestamps and sizes of key `.git` control files: `.git/index`, `.git/HEAD`, and `.git/packed-refs`.
+   - Every 1 second, lx8 checks the `os.Stat` timestamps and sizes of key `.git` control files: `.git/index`, `.git/HEAD`, and `.git/packed-refs`.
    - Any git operation performed in the terminal (`git commit`, `git checkout`, `git add`, `git reset`, `git merge`) immediately touches these files.
-   - When a metadata change is detected, env0 triggers an immediate `UpdateGitStatus()` and broadcasts the delta to the frontend within milliseconds without waiting for the next worktree poll.
+   - When a metadata change is detected, lx8 triggers an immediate `UpdateGitStatus()` and broadcasts the delta to the frontend within milliseconds without waiting for the next worktree poll.
 
 2. **Adaptive Worktree Polling (Worktree Path)**
    - To catch file changes made outside the git CLI (e.g. saving an editor file or external scripts), the engine polls `UpdateGitStatus()`.
@@ -141,7 +141,7 @@ To keep git statuses, sidebar badges, and editor gutter diff indicators in sync 
 
 3. **Visibility & Focus Gating**
    - **Page Visibility API**: When the browser tab is hidden (`document.visibilityState === 'hidden'`), the frontend closes the SSE connection. The backend detects zero active subscribers and pauses background worktree polling completely, saving CPU and laptop battery.
-   - **Instant Focus Wakeup**: When the user switches back to env0 (`focus` or `visibilitychange` to visible), the client reconnects and immediately issues a POST to `/api/git/refresh` to catch any changes made while the user was in another application.
+   - **Instant Focus Wakeup**: When the user switches back to lx8 (`focus` or `visibilitychange` to visible), the client reconnects and immediately issues a POST to `/api/git/refresh` to catch any changes made while the user was in another application.
 
 4. **In-Memory Concurrency & Tree Updates (`UpdateGitStatus`)**
    - Refreshing git status does not re-walk the directory tree on disk.
@@ -164,7 +164,7 @@ To keep git statuses, sidebar badges, and editor gutter diff indicators in sync 
 
 ## 6. How Git Detects Changes Under the Hood
 
-To understand why env0's metadata stat-checking fast path works in sub-milliseconds, it is essential to understand how Git itself detects changes in the working tree.
+To understand why lx8's metadata stat-checking fast path works in sub-milliseconds, it is essential to understand how Git itself detects changes in the working tree.
 
 ### The Stat Cache (`.git/index`)
 
@@ -210,7 +210,7 @@ Whenever a developer runs a Git command in the terminal (`git checkout`, `git re
 * This atomic rename guarantees that the `mtime` and `ctime` of `.git/index` change.
 * Git also updates `.git/HEAD` or ref pointers (`.git/refs/heads/<branch>` or `.git/packed-refs`).
 
-By monitoring the `os.Stat` timestamp of just `.git/index`, `.git/HEAD`, and `.git/packed-refs`, env0's fast path detects any terminal Git action in sub-millisecond time without scanning the workspace.
+By monitoring the `os.Stat` timestamp of just `.git/index`, `.git/HEAD`, and `.git/packed-refs`, lx8's fast path detects any terminal Git action in sub-millisecond time without scanning the workspace.
 
 ---
 
@@ -223,7 +223,7 @@ sequenceDiagram
     autonumber
     actor Dev as Developer (Terminal / CLI)
     participant FS as Local Filesystem (.git/index)
-    participant GW as env0 GitWatcher (Go Backend)
+    participant GW as lx8 GitWatcher (Go Backend)
     participant SSE as SSE Stream (/api/git/stream)
     participant JS as Browser Frontend (gitstream.js)
     participant UI as DOM (Tree, Tabs, Diff Overlay)
@@ -243,7 +243,7 @@ sequenceDiagram
 
 ### Auto-Closing Discarded / Reset Diff Tabs
 
-When developers use env0 to inspect AI agent changes or review git branches, they frequently open modified files directly in git diff view (`diffMode: 'split' | 'unified'`). When changes to those files are subsequently discarded or checked out in the terminal (`git checkout -- file` or `git reset`):
+When developers use lx8 to inspect AI agent changes or review git branches, they frequently open modified files directly in git diff view (`diffMode: 'split' | 'unified'`). When changes to those files are subsequently discarded or checked out in the terminal (`git checkout -- file` or `git reset`):
 
 1. **Diff Tab Tracking**: Tabs opened with git changes or toggled into diff view are tagged with `openedInDiffView = true` alongside `diffMode` in [`web/src/tabs.js`](../../web/src/tabs.js).
 2. **Reverse-Order Reconciliation**: When `handleGitStatus(data)` receives an updated status payload where `statuses[t.path]` is clean (`!isDiff`):
@@ -261,11 +261,11 @@ When developers use env0 to inspect AI agent changes or review git branches, the
    ```
    Iterating in reverse index order ensures index stability when removing multiple tabs simultaneously.
 3. **Active Pointer Stability**: In `closeTab(i)`, closing tabs to the left of the currently active tab decrements `S.active` (`S.active--`) rather than jumping the user to an unintended tab.
-4. **Empty State & Explorer Fallback**: If all git changes are discarded while the sidebar is in changed-only mode (`#tree.changed-only`), env0 automatically toggles back to standard file explorer mode so the user is never left viewing an empty tree.
+4. **Empty State & Explorer Fallback**: If all git changes are discarded while the sidebar is in changed-only mode (`#tree.changed-only`), lx8 automatically toggles back to standard file explorer mode so the user is never left viewing an empty tree.
 
 ## 8. Diffing Against an Arbitrary Base
 
-`gitDiff`/`gitHunks` above are thin `base="HEAD"` wrappers around `gitDiffAgainst`/`gitHunksAgainst`, which take an arbitrary base ref rather than assuming the working tree's `HEAD`. The one other caller is PR review (`env0 <url>`), which diffs a checked-out PR against its merge-base with the target branch instead. See [Pull Request Review](github-pr-review.md).
+`gitDiff`/`gitHunks` above are thin `base="HEAD"` wrappers around `gitDiffAgainst`/`gitHunksAgainst`, which take an arbitrary base ref rather than assuming the working tree's `HEAD`. The one other caller is PR review (`lx8 <url>`), which diffs a checked-out PR against its merge-base with the target branch instead. See [Pull Request Review](github-pr-review.md).
 
 ## 9. Stage, Commit, Push, Pull
 
@@ -281,11 +281,11 @@ The sidebar git panel (`web/src/gitpanel.js`) and the file tree's per-row stage 
 
 ### Fast-Forward-Only Pull
 
-`gitFFOnlyPull(root, remote, ref)` fetches `ref` from `remote` and runs `git merge --ff-only FETCH_HEAD`. If that merge fails for any reason, it returns the sentinel `errNotFastForward` without having touched history — env0 never falls back to a real merge, so there is never a conflicted state to clean up. `handleGitPull` (`server.go`) first refuses (409, `code: "in-progress"`) if a rebase or merge is already half-done (`gitOpInProgress`, which looks for `rebase-merge`/`rebase-apply`/`MERGE_HEAD` in the git dir), then refuses (409) if the working tree is dirty, then resolves the branch's upstream (`gitUpstream`, wrapping `git rev-parse --abbrev-ref <branch>@{u}`) and calls `gitFFOnlyPull`. On `errNotFastForward` it answers 409 through `failSync`, which carries a `gitSyncState` (`code: "diverged"`, branch, upstream, ahead/behind, in-progress op, dirty) next to the message. The fetch has already landed by then, so the counts describe the remote as it is now.
+`gitFFOnlyPull(root, remote, ref)` fetches `ref` from `remote` and runs `git merge --ff-only FETCH_HEAD`. If that merge fails for any reason, it returns the sentinel `errNotFastForward` without having touched history — lx8 never falls back to a real merge, so there is never a conflicted state to clean up. `handleGitPull` (`server.go`) first refuses (409, `code: "in-progress"`) if a rebase or merge is already half-done (`gitOpInProgress`, which looks for `rebase-merge`/`rebase-apply`/`MERGE_HEAD` in the git dir), then refuses (409) if the working tree is dirty, then resolves the branch's upstream (`gitUpstream`, wrapping `git rev-parse --abbrev-ref <branch>@{u}`) and calls `gitFFOnlyPull`. On `errNotFastForward` it answers 409 through `failSync`, which carries a `gitSyncState` (`code: "diverged"`, branch, upstream, ahead/behind, in-progress op, dirty) next to the message. The fetch has already landed by then, so the counts describe the remote as it is now.
 
 ### Agent Rebase / Merge
 
-A diverged pull is where env0's own git writes stop, but the panel can hand the rest to the selected coding harness, only on an explicit click. `POST /api/git/sync-agent` with `{strategy: "rebase" | "merge"}` (`handleGitSyncAgent`) re-reads the sync state, refuses a dirty tree or a mismatched in-progress op, and dispatches `gitSyncPrompt` (`agent.go`) through `agentManager.StartPrompt`, the same one-shot path Commit with AI uses. The prompt states the situation ("git pull is failing ... can't fast-forward ... Run rebase."), the exact commands, how to resolve conflicts, and the rules: never push or force-push, never `rebase --skip`, and `--abort` if a conflict can't be resolved with confidence. When a rebase or merge is already half-done, the prompt asks the harness to finish that one instead of starting over. Mid-rebase HEAD is detached, so `gitRebasingBranch` reads the branch from the rebase's `head-name`.
+A diverged pull is where lx8's own git writes stop, but the panel can hand the rest to the selected coding harness, only on an explicit click. `POST /api/git/sync-agent` with `{strategy: "rebase" | "merge"}` (`handleGitSyncAgent`) re-reads the sync state, refuses a dirty tree or a mismatched in-progress op, and dispatches `gitSyncPrompt` (`agent.go`) through `agentManager.StartPrompt`, the same one-shot path Commit with AI uses. The prompt states the situation ("git pull is failing ... can't fast-forward ... Run rebase."), the exact commands, how to resolve conflicts, and the rules: never push or force-push, never `rebase --skip`, and `--abort` if a conflict can't be resolved with confidence. When a rebase or merge is already half-done, the prompt asks the harness to finish that one instead of starting over. Mid-rebase HEAD is detached, so `gitRebasingBranch` reads the branch from the rebase's `head-name`.
 
 The frontend doesn't trust the harness's exit status. When the job ends it reads `GET /api/git/sync-state` and branches on where the branch actually is: an op still in progress (offer **Finish with AI** or **Abort**), still behind upstream (didn't complete), or caught up (done, offer **Push**). `POST /api/git/abort` (`gitAbortOp`) runs `git rebase --abort` or `git merge --abort`. PR review sessions don't offer any of this; their Pull keeps its own divergence handling.
 
@@ -317,7 +317,7 @@ For a plain workspace, `handleGitPush` runs a bare `gitPush` (`git push`); if th
 | `/api/git/abort` | POST | Abort the rebase or merge in progress. `409` if there is none. |
 | `/api/git/commit-message` | POST | Dispatch the selected harness to write a commit message for the staged diff. Returns an `agentJob`, polled via `/api/agent/job`. `400` if nothing is staged or no harness is selected. |
 
-Every write endpoint is guarded by `localPost` ([`lspsetup.go`](../../lspsetup.go)), the same POST-only, same-origin, IP-or-localhost check every other mutating env0 endpoint uses.
+Every write endpoint is guarded by `localPost` ([`lspsetup.go`](../../lspsetup.go)), the same POST-only, same-origin, IP-or-localhost check every other mutating lx8 endpoint uses.
 
 ## 10. Unpushed Commits (`@{u}..HEAD`)
 
@@ -345,7 +345,7 @@ Three reads share one set of `git diff-tree` flags (`commitDiffArgs`): `--no-com
 
 `gitHunksCommit` feeds `gitDiffCommit`'s output to `parseDiffHunks` — the same state machine `gitHunksAgainst` uses, split out of it so a commit's gutter and the working tree's are parsed by one piece of code.
 
-Every SHA that reaches `exec.Command` as a bare revision passes `validSHA` (`^[0-9a-fA-F]{4,40}$`) first. The only way a SHA reaches these endpoints is from a list env0 itself produced, so anything else is a bug or a probe; refusing it keeps a crafted `--upload-pack=…` out of an argument list.
+Every SHA that reaches `exec.Command` as a bare revision passes `validSHA` (`^[0-9a-fA-F]{4,40}$`) first. The only way a SHA reaches these endpoints is from a list lx8 itself produced, so anything else is a bug or a probe; refusing it keeps a crafted `--upload-pack=…` out of an argument list.
 
 ### The `ref` Parameter on `/api/diff` and `/api/gutter`
 
@@ -373,7 +373,7 @@ All six are GET reads with no `localPost` guard, because none of them changes an
 
 The section lives under the file tree in the sidebar, behind the same **changed files only** toggle as the dirty-file filter — it is a review view, not a home-screen fixture. That toggle's availability is now `hasGitView()` in `tree.js`, which is true when there are working-tree changes **or** unpushed commits: committing everything empties the tree, and without counting commits the toggle would disable itself exactly when the section it reveals became the only thing worth looking at. On a clean tree the tree stops claiming the sidebar's spare height (`#tree.changed-only.no-changes`) and says "Working tree clean", leaving the section the whole of the view.
 
-Clicking a commit expands it into its file list, badged with the same `git-M`/`git-A`/`git-D` classes the tree uses. Clicking a file opens it with `openFile(path, { ref, view: 'diff' })`. A tab carries that commit on `d.diffRef`, shows `@<short-sha>` in the tab strip, and renders its diff in a labelled `In commit <sha>` section. Opening the same path from anywhere else — tree, search, go-to-definition — passes no ref and puts the tab back on the working tree, which is what "open this file" means everywhere else in env0.
+Clicking a commit expands it into its file list, badged with the same `git-M`/`git-A`/`git-D` classes the tree uses. Clicking a file opens it with `openFile(path, { ref, view: 'diff' })`. A tab carries that commit on `d.diffRef`, shows `@<short-sha>` in the tab strip, and renders its diff in a labelled `In commit <sha>` section. Opening the same path from anywhere else — tree, search, go-to-definition — passes no ref and puts the tab back on the working tree, which is what "open this file" means everywhere else in lx8.
 
 A commit-pinned tab is deliberately invisible to the working-tree reconciliation in `gitstream.js`: it is skipped by the auto-close pass, by the `diffAvailable` sync, and by the reload trigger. The working tree going clean is precisely when you still want to be reading one. Tabs are not saved across reloads, so a commit-pinned tab closes with the page.
 

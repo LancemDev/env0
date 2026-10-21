@@ -72,7 +72,7 @@ function openTabMenu(index, x, y) {
    afterwards. The Unpushed sidebar section is what passes it. Opening the same
    path from anywhere else (tree, search, go-to-definition) passes no ref and so
    puts the tab back on the working tree, which is what "open this file" means
-   everywhere else in env0. */
+   everywhere else in lx8. */
 export async function openFile(path, opts = {}) {
   const { line, push = true, col, view, soft = false, ref = '' } = opts;
   const prev = doc_();

@@ -1,11 +1,11 @@
 // web/src/tips-util.js
 
-// The tips ship with the binary and are served from it, so env0 never makes
+// The tips ship with the binary and are served from it, so lx8 never makes
 // a network call to show them.
 export const TIPS_URL = '/static/tips.json';
-export const TIPS_STORAGE_KEY_HIDDEN = 'env0.tips.hidden';
-export const TIPS_STORAGE_KEY_CACHE = 'env0.tips.cache';
-export const TIPS_STORAGE_KEY_INDEX = 'env0.tips.lastIndex';
+export const TIPS_STORAGE_KEY_HIDDEN = 'lx8.tips.hidden';
+export const TIPS_STORAGE_KEY_CACHE = 'lx8.tips.cache';
+export const TIPS_STORAGE_KEY_INDEX = 'lx8.tips.lastIndex';
 
 export const DEFAULT_TIPS = [
   {
@@ -61,7 +61,7 @@ export const DEFAULT_TIPS = [
     title: "Command Palette",
     category: "Navigation",
     tag: "Palette",
-    content: "Access all env0 commands, switch color themes, configure LSP servers, or trigger actions with **`Cmd/Ctrl + Shift + P`**.",
+    content: "Access all lx8 commands, switch color themes, configure LSP servers, or trigger actions with **`Cmd/Ctrl + Shift + P`**.",
     shortcut: "Mod+Shift+P"
   },
   {
@@ -93,7 +93,7 @@ export const DEFAULT_TIPS = [
     title: "Zero-Latency Pull Request Review",
     category: "Git",
     tag: "PR Review",
-    content: "Run `env0 <pr-url>` from your terminal to review GitHub, GitLab, Gitea/Forgejo, or Bitbucket PRs directly with instant diffs and comments."
+    content: "Run `lx8 <pr-url>` from your terminal to review GitHub, GitLab, Gitea/Forgejo, or Bitbucket PRs directly with instant diffs and comments."
   },
   {
     id: "split-unified-diff",
@@ -249,7 +249,7 @@ export const DEFAULT_TIPS = [
     title: "Custom CSS Themes",
     category: "Interface",
     tag: "Theme",
-    content: "Create custom color themes by placing CSS files in `~/.env0/themes/`. env0 concatenates and serves them alongside built-in themes automatically."
+    content: "Create custom color themes by placing CSS files in `~/.lx8/themes/`. lx8 concatenates and serves them alongside built-in themes automatically."
   },
   {
     id: "word-wrap",
@@ -264,21 +264,21 @@ export const DEFAULT_TIPS = [
     title: "Multi-Workspace Workbench",
     category: "Workbench",
     tag: "Workbench",
-    content: "Run `env0` with no arguments to launch the Review Workbench. Quickly reopen recent workspaces, pin favorite projects, or open new PR URLs from a single port."
+    content: "Run `lx8` with no arguments to launch the Review Workbench. Quickly reopen recent workspaces, pin favorite projects, or open new PR URLs from a single port."
   },
   {
     id: "remote-dev",
     title: "Zero-Setup Remote & Cloud Workspaces",
     category: "Terminal",
     tag: "Remote",
-    content: "Run `env0 -host 0.0.0.0` on your remote VM, container, or server to review code locally over Tailscale, SSH port forward, or private LAN without remote agent daemons."
+    content: "Run `lx8 -host 0.0.0.0` on your remote VM, container, or server to review code locally over Tailscale, SSH port forward, or private LAN without remote agent daemons."
   },
   {
     id: "virtual-rendering",
     title: "Ultra-Fast Virtualized Rendering",
     category: "Performance",
     tag: "Performance",
-    content: "env0 smoothly opens files with 400,000+ lines by mounting only visible rows into the DOM and releasing memory back to the OS after 15 seconds of inactivity."
+    content: "lx8 smoothly opens files with 400,000+ lines by mounting only visible rows into the DOM and releasing memory back to the OS after 15 seconds of inactivity."
   },
   {
     id: "settings-ui-json",
@@ -293,7 +293,7 @@ export const DEFAULT_TIPS = [
     title: "Keyboard Shortcuts Reference",
     category: "Navigation",
     tag: "Shortcuts",
-    content: "Press **`?`** anywhere in env0 (when not focused on a text input) to view the cheat sheet of all navigation, editing, and review shortcuts.",
+    content: "Press **`?`** anywhere in lx8 (when not focused on a text input) to view the cheat sheet of all navigation, editing, and review shortcuts.",
     shortcut: "?"
   }
 ];

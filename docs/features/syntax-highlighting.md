@@ -1,6 +1,6 @@
 # Syntax Highlighting & Language Support
 
-env0 delivers fast, accurate syntax highlighting across roughly 280 programming languages, markup formats, and configuration files. Powered by an optimized Chroma lexing engine and viewport windowing, it renders highlighted code with zero typing lag or scrolling stutters.
+lx8 delivers fast, accurate syntax highlighting across roughly 280 programming languages, markup formats, and configuration files. Powered by an optimized Chroma lexing engine and viewport windowing, it renders highlighted code with zero typing lag or scrolling stutters.
 
 ---
 
@@ -8,13 +8,13 @@ env0 delivers fast, accurate syntax highlighting across roughly 280 programming 
 
 Reading code is the predominant activity during code reviews, security audits, and agent pairing sessions. Inaccurate or plain-text rendering increases eye strain and makes understanding complex control flow significantly harder. At the same time, traditional client-side syntax highlighters often block the browser main thread or consume hundreds of megabytes of RAM when tokenizing large files.
 
-env0 provides full native syntax highlighting for almost every language in modern use. By utilizing an intelligent viewport windowing strategy, env0 only highlights lines as they scroll near the visible viewport. This enables instant rendering and silky smooth 60fps scrolling whether viewing a 50-line shell script or a 300,000-line generated database migration.
+lx8 provides full native syntax highlighting for almost every language in modern use. By utilizing an intelligent viewport windowing strategy, lx8 only highlights lines as they scroll near the visible viewport. This enables instant rendering and silky smooth 60fps scrolling whether viewing a 50-line shell script or a 300,000-line generated database migration.
 
 ---
 
 ## Supported Languages & Formats
 
-With built-in support for approximately 280 languages, env0 highlights virtually every language, format, and dialect out of the box with zero plugins required:
+With built-in support for approximately 280 languages, lx8 highlights virtually every language, format, and dialect out of the box with zero plugins required:
 
 - **Systems & Backend**: Go, Rust, C, C++, Zig, C#, Java, Kotlin, Swift, Scala, D, Nim, Fortran, Assembly.
 - **Web & Scripting**: TypeScript, JavaScript, Python, Ruby, PHP, Lua, Perl, Shell (Bash/Zsh/Fish), PowerShell.
@@ -43,7 +43,7 @@ With built-in support for approximately 280 languages, env0 highlights virtually
 Polyglot repositories combining Go services, React/TypeScript frontends, Python analytics scripts, Terraform infrastructure, and Docker configurations render with rich native highlighting instantly without installing language packs or extensions.
 
 ### Instant Opening of Massive Files
-Files that would crash or freeze conventional web-based editors (such as huge SQL dumps or multi-megabyte JSON fixtures) open in env0 in milliseconds because only the visible lines are highlighted.
+Files that would crash or freeze conventional web-based editors (such as huge SQL dumps or multi-megabyte JSON fixtures) open in lx8 in milliseconds because only the visible lines are highlighted.
 
 ---
 

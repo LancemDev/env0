@@ -1,4 +1,4 @@
-module env0
+module lx8
 
 go 1.25
 

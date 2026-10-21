@@ -1,5 +1,5 @@
 // web/src/workbench.js
-// The workbench page (web/workbench.html), what a bare `env0` opens. Bundled on
+// The workbench page (web/workbench.html), what a bare `lx8` opens. Bundled on
 // its own into web/workbench.js by scripts/build-web.js. It shares the app's
 // theme and status-bar metrics modules and nothing else, so it stays small.
 // The server side is workbench.go and workbench_clone.go.
@@ -263,7 +263,7 @@ async function refresh() {
   const cwd = $('#wb-cwd');
   cwd.hidden = !state.cwd;
   cwd.textContent = 'Open ' + tildify(state.cwd);
-  cwd.title = 'Open the folder env0 was started in: ' + state.cwd;
+  cwd.title = 'Open the folder lx8 was started in: ' + state.cwd;
   if (!browsePath) browse(state.cwd);
 }
 

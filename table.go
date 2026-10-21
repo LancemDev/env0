@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	itbl "env0/internal/table"
+	itbl "lx8/internal/table"
 )
 
 const (

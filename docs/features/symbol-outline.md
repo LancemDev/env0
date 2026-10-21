@@ -16,8 +16,8 @@ The symbol outline extracts every structural symbol from the current document in
 
 - **Instant Structural Tree**: Automatically extracts functions, methods, classes, structs, interfaces, enums, type definitions, and package-level constants.
 - **Dual-Engine Architecture**:
-  - **LSP Semantic Outline**: When a Language Server is detected (such as `gopls`, `rust-analyzer`, or `pyright`), env0 pulls high-fidelity semantic document symbols with precise symbol kinds and nested container hierarchies.
-  - **Zero-Config Regex Fallback**: When no language server is running or installed, env0 immediately falls back to high-speed built-in regex parsers across Go, Rust, TypeScript, JavaScript, Python, C/C++, Java, Ruby, and other languages, ensuring outline navigation is always available.
+  - **LSP Semantic Outline**: When a Language Server is detected (such as `gopls`, `rust-analyzer`, or `pyright`), lx8 pulls high-fidelity semantic document symbols with precise symbol kinds and nested container hierarchies.
+  - **Zero-Config Regex Fallback**: When no language server is running or installed, lx8 immediately falls back to high-speed built-in regex parsers across Go, Rust, TypeScript, JavaScript, Python, C/C++, Java, Ruby, and other languages, ensuring outline navigation is always available.
 - **Fuzzy Symbol Filtering**: Type characters in the filter input to narrow down the list. Matches are ranked and highlighted in real time.
 - **Visual Symbol Badges**: Each entry displays an informative badge indicating its kind (e.g., `func`, `struct`, `interface`, `class`, `const`, `var`), allowing you to distinguish methods from types at a glance.
 - **Two Presentation Modes**:

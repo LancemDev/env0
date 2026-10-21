@@ -27,7 +27,7 @@ Type in the compose box and press `Enter` to send (`Shift+Enter` for a new line)
 
 Each message continues the same conversation, so "and what about the tests?" works. While a reply is being written you can press **Stop**; whatever the harness already wrote to disk stays.
 
-The **Model** row under the transcript is the same harness and model choice used everywhere else in env0. You can change it mid-thread: env0 starts a fresh session with the new harness and hands it the earlier transcript.
+The **Model** row under the transcript is the same harness and model choice used everywhere else in lx8. You can change it mid-thread: lx8 starts a fresh session with the new harness and hands it the earlier transcript.
 
 There is no overlap guard. Threads and inline edits can run at the same time, on the same files, and the last write wins.
 
@@ -49,8 +49,8 @@ The default comes from where you started: the editor section a selection was mad
 
 The list shows every thread for the workspace, most recently active first, with its anchor, turn count and age. A spinner marks a thread that is working, and `!` marks one whose last reply failed. **This file** filters to threads started in the open file. The **Threads** tab shows a pulsing dot while any thread is working, so you can leave it and come back.
 
-Threads are stored on disk and survive restarts. A reply that was still running when env0 exited is marked as interrupted. You can delete a thread using the trash button in its header, by hovering over it in the thread list and clicking its trash button (or pressing `Delete`/`Backspace` when focused), or by running **Threads: Delete Current Thread** from the command palette.
+Threads are stored on disk and survive restarts. A reply that was still running when lx8 exited is marked as interrupted. You can delete a thread using the trash button in its header, by hovering over it in the thread list and clicking its trash button (or pressing `Delete`/`Backspace` when focused), or by running **Threads: Delete Current Thread** from the command palette.
 
 ## Requirements
 
-Threads use the coding harness you have selected, the same as inline edits, and are unavailable with `-no-agent`. Harnesses that env0 can hand a session id (Claude Code, and Cursor Agent) keep their own memory of the conversation. With any other harness, env0 sends the earlier transcript along with each message, which works but uses more tokens on long threads.
+Threads use the coding harness you have selected, the same as inline edits, and are unavailable with `-no-agent`. Harnesses that lx8 can hand a session id (Claude Code, and Cursor Agent) keep their own memory of the conversation. With any other harness, lx8 sends the earlier transcript along with each message, which works but uses more tokens on long threads.

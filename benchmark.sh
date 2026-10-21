@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Benchmark env0 against real repositories.
+# Benchmark lx8 against real repositories.
 #
 # Every number printed here comes from a running server: timings from curl,
 # memory from /api/metrics or /proc, index size from the server's own /api/meta.
@@ -7,7 +7,7 @@ set -u
 unalias find 2>/dev/null || true
 unset -f find 2>/dev/null || true
 
-BIN=${BIN:-./env0}
+BIN=${BIN:-./lx8}
 if [ -z "${CORPUS:-}" ]; then
   if [ -d "./bench-repos" ]; then
     CORPUS="./bench-repos"
@@ -57,9 +57,9 @@ modes:
   --json [file]     export benchmark results to JSON format (or stdout if -)
   --csv [file]      export benchmark results to CSV format (or stdout if -)
   --compare <file>  compare current benchmark against baseline JSON file
-  --vscode          measure and compare running VS Code process tree vs env0
+  --vscode          measure and compare running VS Code process tree vs lx8
   --vscode-vanilla  spawn isolated vanilla VS Code (no extensions) & measure
-  --editors         compare env0 vs VS Code (running & vanilla), Neovim, Vim, etc.
+  --editors         compare lx8 vs VS Code (running & vanilla), Neovim, Vim, etc.
   --help            show this
 
 examples:
@@ -78,7 +78,7 @@ examples:
   RUNS=20 ./benchmark.sh bench-repos/redis
 
 environment:
-  BIN=./env0             binary to measure
+  BIN=./lx8             binary to measure
   CORPUS=./bench-repos  where the corpus lives
   PORT=7900             first port to use, incremented per repo
   RUNS=5                requests per timing, the fastest is reported
@@ -110,7 +110,7 @@ clone_corpus() {
 # start DIR PORT [extra flags...] - echoes the pid, waits until it answers
 start_server() {
   local dir=$1 port=$2; shift 2
-  local logfile="$BENCH_TMP/env0-bench-$port.log"
+  local logfile="$BENCH_TMP/lx8-bench-$port.log"
   "$BIN" -no-open -port "$port" "$@" "$dir" >"$logfile" 2>&1 &
   local pid=$!
   SPAWNED_PIDS+=("$pid")
@@ -141,7 +141,7 @@ best_ms() {
   echo "$best"
 }
 
-# Cross-platform RSS measurement: queries env0 /api/metrics if port passed, then /proc, then ps
+# Cross-platform RSS measurement: queries lx8 /api/metrics if port passed, then /proc, then ps
 rss_mb() {
   local pid=$1 port=${2:-}
   if [ -n "$port" ]; then
@@ -170,7 +170,7 @@ rss_mb() {
   echo "?"
 }
 
-# Peak RSS memory in MB: queries env0 /api/metrics peakRSSBytes or falls back to rss_mb
+# Peak RSS memory in MB: queries lx8 /api/metrics peakRSSBytes or falls back to rss_mb
 peak_mb() {
   local pid=$1 port=${2:-}
   if [ -n "$port" ]; then
@@ -336,7 +336,7 @@ bench_memory() {
     printf '  %-34s %s MB\n' "after scrolling through it" "$(rss_mb "$pid" "$port")"
   fi
   # Resident memory includes pages the Go runtime has freed but not yet handed
-  # back. env0 returns them once it has been idle for a while, so wait long
+  # back. lx8 returns them once it has been idle for a while, so wait long
   # enough to see the steady state rather than the high-water mark.
   sleep 8
   printf '  %-34s %s MB\n' "8 seconds idle" "$(rss_mb "$pid" "$port")"
@@ -406,7 +406,7 @@ bench_lsp() {
   printf '  %-26s %s ms\n' "find all references" "$(best_ms "$base/api/lsp/refs?$q")"
   printf '  %-26s %s ms\n' "hover" "$(best_ms "$base/api/lsp/hover?$q")"
   printf '  %-26s %s ms\n' "document outline" "$(best_ms "$base/api/lsp/symbols?path=$(urlenc "$probe")")"
-  printf '  %-26s %s MB   (env0 only; servers are separate processes)\n' "env0 memory" "$(rss_mb "$pid" "$port")"
+  printf '  %-26s %s MB   (lx8 only; servers are separate processes)\n' "lx8 memory" "$(rss_mb "$pid" "$port")"
   local g
   g=$(pgrep -x gopls 2>/dev/null | head -1)
   [ -n "$g" ] && printf '  %-26s %s MB\n' "gopls memory" "$(rss_mb "$g")"
@@ -416,7 +416,7 @@ bench_lsp() {
 }
 
 bench_micro() {
-  echo "### Running env0 Go Micro-Benchmarks..."
+  echo "### Running lx8 Go Micro-Benchmarks..."
   go test -bench=. -benchmem -run=^$ .
 }
 
@@ -427,7 +427,7 @@ bench_load() {
   local port=$PORT
   echo "### Running Concurrent Load Benchmark on $abs_target (Port $port)..."
   local pid
-  pid=$(start_server "$abs_target" "$port" -quiet) || die "failed to start env0"
+  pid=$(start_server "$abs_target" "$port" -quiet) || die "failed to start lx8"
 
   python3 -c "
 import urllib.request, time, concurrent.futures, statistics
@@ -558,16 +558,16 @@ for repo, cur in current.items():
 bench_vscode() {
   local target=${1:-.}
   local port=$PORT
-  echo "### Measuring env0 on $target ..."
+  echo "### Measuring lx8 on $target ..."
   local pid
-  pid=$(start_server "$target" "$port" -quiet) || die "failed to start env0 on port $port"
+  pid=$(start_server "$target" "$port" -quiet) || die "failed to start lx8 on port $port"
   sleep 1
-  local env0_rss env0_meta
-  env0_rss=$(rss_mb "$pid" "$port")
-  env0_meta=$(curl -sf "http://127.0.0.1:$port/api/meta" || echo '{"files":0,"indexMs":0}')
-  local env0_files env0_idx
-  env0_files=$(echo "$env0_meta" | sed 's/.*"files":\([0-9]*\).*/\1/')
-  env0_idx=$(echo "$env0_meta" | sed 's/.*"indexMs":\([0-9]*\).*/\1/')
+  local lx8_rss lx8_meta
+  lx8_rss=$(rss_mb "$pid" "$port")
+  lx8_meta=$(curl -sf "http://127.0.0.1:$port/api/meta" || echo '{"files":0,"indexMs":0}')
+  local lx8_files lx8_idx
+  lx8_files=$(echo "$lx8_meta" | sed 's/.*"files":\([0-9]*\).*/\1/')
+  lx8_idx=$(echo "$lx8_meta" | sed 's/.*"indexMs":\([0-9]*\).*/\1/')
   kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null || true
 
   python3 -c "
@@ -648,18 +648,18 @@ for pid, info in p2.items():
 breakdown.sort(reverse=True, key=lambda x: x[0])
 total_vs_mb = total_vs_rss / 1024.0
 
-env0_mem = $env0_rss if '$env0_rss'.isdigit() else 25
-env0_files = '$env0_files'
-env0_idx = '$env0_idx'
+lx8_mem = $lx8_rss if '$lx8_rss'.isdigit() else 25
+lx8_files = '$lx8_files'
+lx8_idx = '$lx8_idx'
 
-print('\n### env0 vs. VS Code Comparison\n')
-print('| Metric / Parameter | env0 | VS Code (Server/Remote) | Notes |')
+print('\n### lx8 vs. VS Code Comparison\n')
+print('| Metric / Parameter | lx8 | VS Code (Server/Remote) | Notes |')
 print('| ------------------ | --- | ----------------------- | ----- |')
-print(f'| **Memory (RSS)** | **{env0_mem} MB** | **{total_vs_mb:.1f} MB** | {total_vs_mb/max(1, float(env0_mem)):.0f}x lighter |')
+print(f'| **Memory (RSS)** | **{lx8_mem} MB** | **{total_vs_mb:.1f} MB** | {total_vs_mb/max(1, float(lx8_mem)):.0f}x lighter |')
 print(f'| **Instant CPU %** | **0.0%** | **{total_vs_cpu:.1f}%** | Measured over 1s |')
-print(f'| **Index Time** | **{env0_idx} ms** ({env0_files} files) | **~4 - 10 s** | env0 is immediate |')
+print(f'| **Index Time** | **{lx8_idx} ms** ({lx8_files} files) | **~4 - 10 s** | lx8 is immediate |')
 print(f'| **Process Count** | **1 single Go binary** | **{len(p2)} processes** | Multi-process Node tree |')
-print('\n*Note: env0 RSS measures the host Go daemon (~20–30 MB). A browser tab displaying the UI adds ~80–150 MB, for a total system footprint of ~100–180 MB (still ~85–90% lighter than VS Code\'s full process tree).*')
+print('\n*Note: lx8 RSS measures the host Go daemon (~20–30 MB). A browser tab displaying the UI adds ~80–150 MB, for a total system footprint of ~100–180 MB (still ~85–90% lighter than VS Code\'s full process tree).*')
 
 if breakdown:
     print('\n#### VS Code Process Breakdown\n')
@@ -675,16 +675,16 @@ bench_vscode_vanilla() {
   local abs_target
   abs_target=$(resolve "$target") || abs_target="$target"
   local port=$PORT
-  echo "### Measuring env0 on $abs_target ..."
+  echo "### Measuring lx8 on $abs_target ..."
   local pid
-  pid=$(start_server "$abs_target" "$port" -quiet) || die "failed to start env0 on port $port"
+  pid=$(start_server "$abs_target" "$port" -quiet) || die "failed to start lx8 on port $port"
   sleep 1
-  local env0_rss env0_meta
-  env0_rss=$(rss_mb "$pid" "$port")
-  env0_meta=$(curl -sf "http://127.0.0.1:$port/api/meta" || echo '{"files":0,"indexMs":0}')
-  local env0_files env0_idx
-  env0_files=$(echo "$env0_meta" | sed 's/.*"files":\([0-9]*\).*/\1/')
-  env0_idx=$(echo "$env0_meta" | sed 's/.*"indexMs":\([0-9]*\).*/\1/')
+  local lx8_rss lx8_meta
+  lx8_rss=$(rss_mb "$pid" "$port")
+  lx8_meta=$(curl -sf "http://127.0.0.1:$port/api/meta" || echo '{"files":0,"indexMs":0}')
+  local lx8_files lx8_idx
+  lx8_files=$(echo "$lx8_meta" | sed 's/.*"files":\([0-9]*\).*/\1/')
+  lx8_idx=$(echo "$lx8_meta" | sed 's/.*"indexMs":\([0-9]*\).*/\1/')
   kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null || true
 
   echo "### Spawning Vanilla VS Code (no extensions, clean user-data-dir) on $abs_target ..."
@@ -695,9 +695,9 @@ tmp_user = tempfile.mkdtemp(prefix='vscode_bench_user_')
 tmp_ext = tempfile.mkdtemp(prefix='vscode_bench_ext_')
 
 target_path = '$abs_target'
-env0_mem = $env0_rss if '$env0_rss'.isdigit() else 25
-env0_files = '$env0_files'
-env0_idx = '$env0_idx'
+lx8_mem = $lx8_rss if '$lx8_rss'.isdigit() else 25
+lx8_files = '$lx8_files'
+lx8_idx = '$lx8_idx'
 
 code_bin = shutil.which('code')
 if not code_bin:
@@ -761,14 +761,14 @@ def get_proc_info(pids):
 vs_rss, breakdown = get_proc_info(new_pids)
 breakdown.sort(reverse=True, key=lambda x: x[0])
 
-print('\n### env0 vs. Vanilla VS Code Comparison\n')
-print('| Metric / Parameter | env0 | Vanilla VS Code (Clean) | Difference |')
+print('\n### lx8 vs. Vanilla VS Code Comparison\n')
+print('| Metric / Parameter | lx8 | Vanilla VS Code (Clean) | Difference |')
 print('| ------------------ | --- | ----------------------- | ---------- |')
-print(f'| **Memory (RSS)** | **{env0_mem} MB** | **{vs_rss:.1f} MB** | {vs_rss/max(1, float(env0_mem)):.0f}x lighter |')
-print(f'| **Index Time** | **{env0_idx} ms** ({env0_files} files) | **~2 - 5 s** | env0 is immediate |')
+print(f'| **Memory (RSS)** | **{lx8_mem} MB** | **{vs_rss:.1f} MB** | {vs_rss/max(1, float(lx8_mem)):.0f}x lighter |')
+print(f'| **Index Time** | **{lx8_idx} ms** ({lx8_files} files) | **~2 - 5 s** | lx8 is immediate |')
 print(f'| **Process Count** | **1 single Go binary** | **{len(new_pids)} processes** | Multi-process tree |')
 print(f'| **Extensions** | Native built-ins | Disabled (0 active) | Clean isolate |')
-print('\n*Note: env0 RSS reflects the host Go daemon (~20–30 MB). Including a client browser tab (~80–150 MB), env0 total memory is ~100–180 MB vs vanilla VS Code.*')
+print('\n*Note: lx8 RSS reflects the host Go daemon (~20–30 MB). Including a client browser tab (~80–150 MB), lx8 total memory is ~100–180 MB vs vanilla VS Code.*')
 
 if breakdown:
     print('\n#### Vanilla VS Code Process Breakdown\n')
@@ -789,26 +789,26 @@ bench_editors() {
   local port=$PORT
   echo "### Measuring editors on: $abs_target"
   local pid
-  pid=$(start_server "$abs_target" "$port" -quiet) || die "failed to start env0 on port $port"
+  pid=$(start_server "$abs_target" "$port" -quiet) || die "failed to start lx8 on port $port"
   sleep 1
-  local env0_rss env0_meta
-  env0_rss=$(rss_mb "$pid" "$port")
-  env0_meta=$(curl -sf "http://127.0.0.1:$port/api/meta" || echo '{"files":0,"indexMs":0}')
-  local env0_files env0_idx
-  env0_files=$(echo "$env0_meta" | sed 's/.*"files":\([0-9]*\).*/\1/')
-  env0_idx=$(echo "$env0_meta" | sed 's/.*"indexMs":\([0-9]*\).*/\1/')
+  local lx8_rss lx8_meta
+  lx8_rss=$(rss_mb "$pid" "$port")
+  lx8_meta=$(curl -sf "http://127.0.0.1:$port/api/meta" || echo '{"files":0,"indexMs":0}')
+  local lx8_files lx8_idx
+  lx8_files=$(echo "$lx8_meta" | sed 's/.*"files":\([0-9]*\).*/\1/')
+  lx8_idx=$(echo "$lx8_meta" | sed 's/.*"indexMs":\([0-9]*\).*/\1/')
   kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null || true
 
   python3 -c "
 import subprocess, time, shutil, tempfile, os
 
 target = '$abs_target'
-env0_mem = $env0_rss if '$env0_rss'.isdigit() else 25
-env0_files = '$env0_files'
-env0_idx = '$env0_idx'
+lx8_mem = $lx8_rss if '$lx8_rss'.isdigit() else 25
+lx8_files = '$lx8_files'
+lx8_idx = '$lx8_idx'
 
 results = []
-results.append(('env0', 'Single native Go server', f'{env0_mem} MB', f'~10 ms', f'~{10 + int(float(env0_idx))} ms', '1 process (native)'))
+results.append(('lx8', 'Single native Go server', f'{lx8_mem} MB', f'~10 ms', f'~{10 + int(float(lx8_idx))} ms', '1 process (native)'))
 
 # 1. VS Code
 try:
@@ -920,7 +920,7 @@ print('| Editor | Configuration | Memory (RSS) | Time to Open | Time to First In
 print('| :--- | :--- | :--- | :--- | :--- | :--- |')
 for row in results:
     print(f'| **{row[0]}** | {row[1]} | **{row[2]}** | {row[3]} | {row[4]} | {row[5]} |')
-print('\n*Note: env0 RSS measures the host Go server (~20–30 MB). The web frontend runs in an existing browser tab (~80–150 MB), bringing total system memory to ~100–180 MB. Run benchmark.sh with --vscode-vanilla to measure clean VS Code.*')
+print('\n*Note: lx8 RSS measures the host Go server (~20–30 MB). The web frontend runs in an existing browser tab (~80–150 MB), bringing total system memory to ~100–180 MB. Run benchmark.sh with --vscode-vanilla to measure clean VS Code.*')
 "
 }
 
@@ -937,24 +937,24 @@ case "${1-}" in
   --json)    shift; EXPORT_JSON="${1:--}"; shift 2>/dev/null || true ;;
   --csv)     shift; EXPORT_CSV="${1:--}"; shift 2>/dev/null || true ;;
   --memory)  shift; [ $# -gt 0 ] || set -- "$CORPUS"/*/
-             [ -x "$BIN" ] || die "$BIN not found; run: go build -o env0 ."
+             [ -x "$BIN" ] || die "$BIN not found; run: go build -o lx8 ."
              for t in "$@"; do bench_memory "${t%/}"; done; exit 0 ;;
   --lsp)     shift; [ $# -gt 0 ] || set -- .
-             [ -x "$BIN" ] || die "$BIN not found; run: go build -o env0 ."
+             [ -x "$BIN" ] || die "$BIN not found; run: go build -o lx8 ."
              for t in "$@"; do bench_lsp "${t%/}"; done; exit 0 ;;
   --vscode)  shift; [ $# -gt 0 ] || set -- .
-             [ -x "$BIN" ] || die "$BIN not found; run: go build -o env0 ."
+             [ -x "$BIN" ] || die "$BIN not found; run: go build -o lx8 ."
              bench_vscode "${1%/}"; exit 0 ;;
   --vscode-vanilla) shift; [ $# -gt 0 ] || set -- .
-             [ -x "$BIN" ] || die "$BIN not found; run: go build -o env0 ."
+             [ -x "$BIN" ] || die "$BIN not found; run: go build -o lx8 ."
              bench_vscode_vanilla "${1%/}"; exit 0 ;;
   --editors) shift; [ $# -gt 0 ] || set -- .
-             [ -x "$BIN" ] || die "$BIN not found; run: go build -o env0 ."
+             [ -x "$BIN" ] || die "$BIN not found; run: go build -o lx8 ."
              bench_editors "${1%/}"; exit 0 ;;
   -*)        die "unknown option: $1 (try --help)" ;;
 esac
 
-[ -x "$BIN" ] || die "$BIN not found; run: go build -o env0 ."
+[ -x "$BIN" ] || die "$BIN not found; run: go build -o lx8 ."
 command -v curl >/dev/null || die "curl is required"
 
 targets=("$@")

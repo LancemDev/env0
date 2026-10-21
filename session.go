@@ -32,16 +32,16 @@ type WorkspaceSession struct {
 	Drafts   []prComment  `json:"drafts,omitempty"`
 }
 
-// sessionDir returns the directory holding session files: XDG_STATE_HOME/env0/sessions
-// if available, falling back to ~/.env0/sessions or os.TempDir()/env0-sessions.
+// sessionDir returns the directory holding session files: XDG_STATE_HOME/lx8/sessions
+// if available, falling back to ~/.lx8/sessions or os.TempDir()/lx8-sessions.
 func sessionDir() string {
 	if xdg := os.Getenv("XDG_STATE_HOME"); xdg != "" {
-		return filepath.Join(xdg, "env0", "sessions")
+		return filepath.Join(xdg, "lx8", "sessions")
 	}
 	if home, err := os.UserHomeDir(); err == nil && home != "" {
-		return filepath.Join(home, ".env0", "sessions")
+		return filepath.Join(home, ".lx8", "sessions")
 	}
-	return filepath.Join(os.TempDir(), "env0-sessions")
+	return filepath.Join(os.TempDir(), "lx8-sessions")
 }
 
 // sessionFilePath returns the path to the JSON file where workspace session state is saved.

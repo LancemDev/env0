@@ -28,12 +28,12 @@ func TestWorkbenchItemIDsAreStable(t *testing.T) {
 	if a.ID != b.ID || len(a.ID) != 12 {
 		t.Fatalf("dir ids differ or wrong length: %q %q", a.ID, b.ID)
 	}
-	p1 := wbPRItem(PRTarget{Provider: "github", Owner: "lancemdev", Repo: "env0", Number: 7, URL: "https://github.com/lancemdev/env0/pull/7"})
-	p2 := wbPRItem(PRTarget{Provider: "github", Owner: "LancemDev", Repo: "env0", Number: 7, URL: "https://github.com/LancemDev/env0/pull/7/files"})
+	p1 := wbPRItem(PRTarget{Provider: "github", Owner: "lancemdev", Repo: "lx8", Number: 7, URL: "https://github.com/lancemdev/lx8/pull/7"})
+	p2 := wbPRItem(PRTarget{Provider: "github", Owner: "LancemDev", Repo: "lx8", Number: 7, URL: "https://github.com/LancemDev/lx8/pull/7/files"})
 	if p1.ID != p2.ID {
 		t.Fatalf("same PR got different ids: %q %q", p1.ID, p2.ID)
 	}
-	if p1.ID == wbDirItem("LancemDev/env0#7").ID {
+	if p1.ID == wbDirItem("LancemDev/lx8#7").ID {
 		t.Fatal("dir and PR ids must not collide")
 	}
 }
@@ -107,14 +107,14 @@ func TestRemoteMatchesRepo(t *testing.T) {
 		origin string
 		want   bool
 	}{
-		{"git@github.com:LancemDev/env0.git\n", true},
-		{"https://github.com/LancemDev/env0", true},
-		{"ssh://git@github.com/LancemDev/env0.git", true},
-		{"https://github.com/LancemDev/env0-docs.git", false},
-		{"https://github.com/other/env0.git", false},
+		{"git@github.com:LancemDev/lx8.git\n", true},
+		{"https://github.com/LancemDev/lx8", true},
+		{"ssh://git@github.com/LancemDev/lx8.git", true},
+		{"https://github.com/LancemDev/lx8-docs.git", false},
+		{"https://github.com/other/lx8.git", false},
 	}
 	for _, c := range cases {
-		if got := remoteMatchesRepo(c.origin, "LancemDev", "env0"); got != c.want {
+		if got := remoteMatchesRepo(c.origin, "LancemDev", "lx8"); got != c.want {
 			t.Errorf("%q: got %v", c.origin, got)
 		}
 	}
@@ -155,9 +155,9 @@ func TestLineWriterSplitsLinesAndSpinnerFrames(t *testing.T) {
 	var got []string
 	lw := &lineWriter{fn: func(s string) { got = append(got, s) }}
 	io.WriteString(lw, "one\r\ntw")
-	io.WriteString(lw, "o\n⠋ Cloning\r⠙ Cloning\renv0-ready 127.0.0.1:1\nlast")
+	io.WriteString(lw, "o\n⠋ Cloning\r⠙ Cloning\rlx8-ready 127.0.0.1:1\nlast")
 	lw.Flush()
-	want := []string{"one", "two", "env0-ready 127.0.0.1:1", "last"}
+	want := []string{"one", "two", "lx8-ready 127.0.0.1:1", "last"}
 	if strings.Join(got, "|") != strings.Join(want, "|") {
 		t.Fatalf("got %q", got)
 	}
@@ -173,11 +173,11 @@ func TestWorkbenchResolveTarget(t *testing.T) {
 	if err != nil || it.Kind != "dir" || filepath.Base(it.Path) != "sub" {
 		t.Fatalf("relative dir: %+v %v", it, err)
 	}
-	it, err = wb.resolveTarget("https://github.com/LancemDev/env0/pull/12")
-	if err != nil || it.Kind != "pr" || it.Repo != "LancemDev/env0" || it.Number != 12 {
+	it, err = wb.resolveTarget("https://github.com/LancemDev/lx8/pull/12")
+	if err != nil || it.Kind != "pr" || it.Repo != "LancemDev/lx8" || it.Number != 12 {
 		t.Fatalf("pr: %+v %v", it, err)
 	}
-	for _, bad := range []string{"", "https://github.com/LancemDev/env0", filepath.Join(dir, "missing")} {
+	for _, bad := range []string{"", "https://github.com/LancemDev/lx8", filepath.Join(dir, "missing")} {
 		if _, err := wb.resolveTarget(bad); err == nil {
 			t.Errorf("%q: want error", bad)
 		}
@@ -249,14 +249,14 @@ func TestWorkbenchUnknownWorkspace(t *testing.T) {
 	}
 }
 
-// End to end: a real env0 binary opened as a workspace, reached through the
+// End to end: a real lx8 binary opened as a workspace, reached through the
 // workbench's proxy, then stopped through its stdin.
 func TestWorkbenchRunsChildThroughProxy(t *testing.T) {
 	if testing.Short() {
-		t.Skip("builds the env0 binary")
+		t.Skip("builds the lx8 binary")
 	}
 	newTestStore(t)
-	exe := filepath.Join(t.TempDir(), "env0")
+	exe := filepath.Join(t.TempDir(), "lx8")
 	if out, err := exec.Command("go", "build", "-o", exe, ".").CombinedOutput(); err != nil {
 		t.Fatalf("build: %v\n%s", err, out)
 	}
@@ -353,8 +353,8 @@ func TestWorkbenchForgetsNewItemThatFails(t *testing.T) {
 	}
 	newTestStore(t)
 	dir := t.TempDir()
-	exe := filepath.Join(dir, "fake-env0")
-	os.WriteFile(exe, []byte("#!/bin/sh\necho 'env0: env0: github: fetch PR #9: 404 Not Found' >&2\nexit 1\n"), 0o755)
+	exe := filepath.Join(dir, "fake-lx8")
+	os.WriteFile(exe, []byte("#!/bin/sh\necho 'lx8: lx8: github: fetch PR #9: 404 Not Found' >&2\nexit 1\n"), 0o755)
 	wb := newWorkbench("/", dir, exe, nil)
 	defer wb.Close()
 
@@ -401,35 +401,35 @@ func gitRepoWithRemotes(t *testing.T, remotes map[string]string) string {
 
 func TestFindPRRemotePrefersOriginThenUpstream(t *testing.T) {
 	fork := gitRepoWithRemotes(t, map[string]string{
-		"origin":   "git@github.com:me/env0.git",
-		"upstream": "https://github.com/LancemDev/env0.git",
+		"origin":   "git@github.com:me/lx8.git",
+		"upstream": "https://github.com/LancemDev/lx8.git",
 	})
-	if top, remote := findPRRemote(fork, "LancemDev", "env0"); top != fork || remote != "upstream" {
+	if top, remote := findPRRemote(fork, "LancemDev", "lx8"); top != fork || remote != "upstream" {
 		t.Fatalf("fork: %q %q", top, remote)
 	}
 	both := gitRepoWithRemotes(t, map[string]string{
-		"origin":   "https://github.com/LancemDev/env0",
-		"upstream": "https://github.com/LancemDev/env0.git",
+		"origin":   "https://github.com/LancemDev/lx8",
+		"upstream": "https://github.com/LancemDev/lx8.git",
 	})
-	if _, remote := findPRRemote(both, "LancemDev", "env0"); remote != "origin" {
+	if _, remote := findPRRemote(both, "LancemDev", "lx8"); remote != "origin" {
 		t.Fatalf("both: %q", remote)
 	}
-	other := gitRepoWithRemotes(t, map[string]string{"origin": "https://github.com/LancemDev/env0-docs.git"})
-	if top, _ := findPRRemote(other, "LancemDev", "env0"); top != "" {
+	other := gitRepoWithRemotes(t, map[string]string{"origin": "https://github.com/LancemDev/lx8-docs.git"})
+	if top, _ := findPRRemote(other, "LancemDev", "lx8"); top != "" {
 		t.Fatalf("other repo matched: %q", top)
 	}
 }
 
 func TestScanForCloneFindsNestedClone(t *testing.T) {
 	root := t.TempDir()
-	clone := filepath.Join(root, "work", "env0")
-	os.MkdirAll(filepath.Join(root, "work", "node_modules", "env0"), 0o755)
+	clone := filepath.Join(root, "work", "lx8")
+	os.MkdirAll(filepath.Join(root, "work", "node_modules", "lx8"), 0o755)
 	if out, err := exec.Command("git", "init", "-q", clone).CombinedOutput(); err != nil {
 		t.Fatalf("%v %s", err, out)
 	}
-	exec.Command("git", "-C", clone, "remote", "add", "origin", "git@github.com:LancemDev/env0.git").Run()
+	exec.Command("git", "-C", clone, "remote", "add", "origin", "git@github.com:LancemDev/lx8.git").Run()
 	want, _ := filepath.EvalSymlinks(clone)
-	if got := scanForClone(context.Background(), []string{root}, "LancemDev/env0"); got != want {
+	if got := scanForClone(context.Background(), []string{root}, "LancemDev/lx8"); got != want {
 		t.Fatalf("got %q, want %q", got, want)
 	}
 	if got := scanForClone(context.Background(), []string{root}, "LancemDev/other"); got != "" {
@@ -452,7 +452,7 @@ func postJSON(t *testing.T, h http.Handler, path, body string) *httptest.Respons
 func TestWorkbenchOpenPRAsksForClone(t *testing.T) {
 	newTestStore(t)
 	t.Setenv("HOME", t.TempDir()) // keep the scan away from real code folders
-	wb := newWorkbench("/", t.TempDir(), "/nonexistent/env0", nil)
+	wb := newWorkbench("/", t.TempDir(), "/nonexistent/lx8", nil)
 	defer wb.Close()
 	pr := "https://github.com/acme/widget/pull/5"
 

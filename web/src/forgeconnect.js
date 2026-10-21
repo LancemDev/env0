@@ -1,5 +1,5 @@
 // web/src/forgeconnect.js
-// The Connect dialog: getting a forge token without leaving env0 or reading
+// The Connect dialog: getting a forge token without leaving lx8 or reading
 // docs first. It opens wherever a token is missing (the PR bar's "No token"
 // note, the git panel's nudge, or any comment, review or merge tried
 // without one) and walks through it for the forge and host at hand: the
@@ -16,7 +16,7 @@ import { openSettings } from './settings.js';
 const connectModal = () => $('#forge-connect-modal');
 
 const SOURCES = {
-  settings: 'a token saved in env0 Settings',
+  settings: 'a token saved in lx8 Settings',
   env: 'an environment variable',
   gh: 'the GitHub CLI (gh)',
   glab: 'the GitLab CLI (glab)',
@@ -65,7 +65,7 @@ export function openForgeConnect(reason = '') {
   $('#forge-connect-host').textContent = host || '';
 
   let why = hasToken
-    ? `env0 is using ${SOURCES[source] || 'a token'} for ${esc(host)}. Paste a new one to replace it.`
+    ? `lx8 is using ${SOURCES[source] || 'a token'} for ${esc(host)}. Paste a new one to replace it.`
     : `${esc(setup.readonly || '')}`;
   if (reason && !hasToken) why = `A ${esc(info.label)} token is needed ${esc(reason)}. ` + why;
   $('#forge-connect-why').innerHTML = why;
@@ -87,11 +87,11 @@ export function openForgeConnect(reason = '') {
 
   const alts = [`set ${codeTag(setup.env)}`];
   if (setup.cli) alts.push(`run ${codeTag(setup.cli)}`);
-  $('#forge-connect-alt').innerHTML = `Or ${alts.join(' or ')} in your shell, then restart env0.` +
-    (setup.hostKey ? ` env0 sends the token only to ${esc(host)}.` : '');
+  $('#forge-connect-alt').innerHTML = `Or ${alts.join(' or ')} in your shell, then restart lx8.` +
+    (setup.hostKey ? ` lx8 sends the token only to ${esc(host)}.` : '');
   $('#forge-connect-check').textContent = pr
-    ? 'env0 checks the token by reading this pull request with it before saving it.'
-    : 'Saved to your env0 settings. It is checked the next time you open a pull request.';
+    ? 'lx8 checks the token by reading this pull request with it before saving it.'
+    : 'Saved to your lx8 settings. It is checked the next time you open a pull request.';
 
   $('#forge-connect-token').value = '';
   $('#forge-connect-extra-input').value = '';

@@ -1,14 +1,14 @@
 # Environment File Editor
 
-env0 is built around one job: keeping a project's `.env` files correct without
+lx8 is built around one job: keeping a project's `.env` files correct without
 ever leaving the browser. A `.env` file is a list of assignments, comments and
-blank lines, and env0 edits it as a list rather than as a wall of text.
+blank lines, and lx8 edits it as a list rather than as a wall of text.
 
 ---
 
 ## What counts as a .env file
 
-env0 recognises a file as an environment file when its name is:
+lx8 recognises a file as an environment file when its name is:
 
 | Name | Recognised |
 | :--- | :--- |
@@ -103,7 +103,7 @@ leave a half-written `.env` behind.
 ## What is preserved
 
 A file you open and save without changing comes back **byte for byte the
-same**. env0 keeps:
+same**. lx8 keeps:
 
 - comments, blank lines and the order of everything;
 - the `export` prefix on an assignment;
@@ -127,7 +127,7 @@ An existing file keeps the permissions it already had.
 
 ## The format
 
-env0 follows the conventions dotenv, docker-compose and 12-factor apps agree
+lx8 follows the conventions dotenv, docker-compose and 12-factor apps agree
 on:
 
 ```env

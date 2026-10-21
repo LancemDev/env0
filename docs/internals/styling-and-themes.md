@@ -1,8 +1,8 @@
 # Styling & Theme Architecture
 
-This document describes env0's styling architecture, CSS custom property design system, dynamic theme loading pipeline, and token specifications.
+This document describes lx8's styling architecture, CSS custom property design system, dynamic theme loading pipeline, and token specifications.
 
-env0 reads every colour in the user interface through a CSS custom property, known as a token. A theme is defined in a single CSS file that assigns values to these tokens.
+lx8 reads every colour in the user interface through a CSS custom property, known as a token. A theme is defined in a single CSS file that assigns values to these tokens.
 
 ## 1. How Themes Load
 
@@ -10,7 +10,7 @@ env0 reads every colour in the user interface through a CSS custom property, kno
 - `web/themes/<id>.css`: Each theme resides in its own file under [`web/themes/`](../../web/themes/), containing a single rule for `:root[data-theme="<id>"]`. The filename without extension acts as the theme ID.
 - Dynamic Concatenation (`/static/themes.css`): The Go server concatenates every file matching `web/themes/*.css` in alphanumeric order and serves the result dynamically at `/static/themes.css`. [`web/index.html`](../../web/index.html) links this file immediately after `style.css`.
 - Client-Side Discovery: At application boot, [`web/src/theme.js`](../../web/src/theme.js) scans the loaded document stylesheets for rules matching `:root[data-theme="<id>"]`. It extracts the human-readable display name from `--theme-name` and the color scheme hint from `color-scheme`.
-- State Persistence: The active theme is applied via the `data-theme` attribute on the `<html>` root element and persisted in `localStorage` under `env0.theme`. If a saved theme is removed, env0 falls back to the default `catppuccin-mocha`.
+- State Persistence: The active theme is applied via the `data-theme` attribute on the `<html>` root element and persisted in `localStorage` under `lx8.theme`. If a saved theme is removed, lx8 falls back to the default `catppuccin-mocha`.
 
 > [!NOTE]
 > Theme rules intentionally use `:root[data-theme="<id>"]` rather than a bare attribute selector `[data-theme="<id>"]`. The `:root` pseudo-class raises CSS specificity above the fallback rules in `style.css`, ensuring theme tokens always win regardless of stylesheet evaluation order.
@@ -22,7 +22,7 @@ The explorer header controls use the same tokenized `.mini` button style as Re-i
 | Name             | ID                 | Scheme | Inspiration / Palette                  |
 | ---------------- | ------------------ | ------ | -------------------------------------- |
 | Catppuccin Latte | `catppuccin-latte` | light  | Catppuccin palette (contrast-tuned)    |
-| Catppuccin Mocha | `catppuccin-mocha` | dark   | Catppuccin palette (default env0 theme) |
+| Catppuccin Mocha | `catppuccin-mocha` | dark   | Catppuccin palette (default lx8 theme) |
 | Dracula          | `dracula`          | dark   | Classic Dracula palette                |
 | GitHub Dark      | `github-dark`      | dark   | GitHub dark default                    |
 | Gruvbox Dark     | `gruvbox-dark`     | dark   | Gruvbox dark retro groove              |
@@ -52,7 +52,7 @@ The explorer header controls use the same tokenized `.mini` button style as Re-i
   color-scheme: dark;
   ```
 1. Define the required color tokens (see Token Reference below).
-1. Preview by running env0 with `go run .` (rebuild after each CSS change; themes are embedded):
+1. Preview by running lx8 with `go run .` (rebuild after each CSS change; themes are embedded):
   ```bash
   go run . .
   ```
@@ -60,7 +60,7 @@ The explorer header controls use the same tokenized `.mini` button style as Re-i
   ```bash
   go test ./...
   ```
-  `TestThemesStylesheetJoinsEveryThemeFile` in [`env0_test.go`](../../env0_test.go) ensures all required tokens are present and selector IDs match filenames.
+  `TestThemesStylesheetJoinsEveryThemeFile` in [`lx8_test.go`](../../lx8_test.go) ensures all required tokens are present and selector IDs match filenames.
 
 ### Minimal Working Theme Example
 
@@ -153,7 +153,7 @@ CSV and TSV tabs render inside `#mdview` with the article's class switched from 
 
 ## 6. Mermaid Diagram Styling
 
-Mermaid fences render inside `.md-mermaid`, a tokenized, scrollable surface using `--bg2`, `--bg3`, `--bg4`, `--line`, and `--err`; generated SVG is constrained to the article width. Each diagram's controls toolbar provides zoom in/out, fit, and full-screen maximize using those same tokens, scaling only its `.md-mermaid-canvas`. In full-screen mode (`.md-mermaid.is-fullscreen`), the surface takes over the full viewport using `--bg`, locks `document.body` scroll via `.mermaid-fs-active`, pins the controls to the top-left, and provides dedicated close buttons (`.md-mermaid-fs-close` in the top-right corner and `.md-mermaid-fs-only` in the toolbar) for easy zoom and `Esc` dismissal. Mermaid itself receives a `base` theme derived from the active env0 theme's `--bg`, `--bg2`, `--bg3`, `--fg`, `--dim`, and `--line` values. `setTheme` emits `theme:changed`, and the Markdown preview debounces a rerender of the active diagrams so both palette previews and persisted theme changes remain readable.
+Mermaid fences render inside `.md-mermaid`, a tokenized, scrollable surface using `--bg2`, `--bg3`, `--bg4`, `--line`, and `--err`; generated SVG is constrained to the article width. Each diagram's controls toolbar provides zoom in/out, fit, and full-screen maximize using those same tokens, scaling only its `.md-mermaid-canvas`. In full-screen mode (`.md-mermaid.is-fullscreen`), the surface takes over the full viewport using `--bg`, locks `document.body` scroll via `.mermaid-fs-active`, pins the controls to the top-left, and provides dedicated close buttons (`.md-mermaid-fs-close` in the top-right corner and `.md-mermaid-fs-only` in the toolbar) for easy zoom and `Esc` dismissal. Mermaid itself receives a `base` theme derived from the active lx8 theme's `--bg`, `--bg2`, `--bg3`, `--fg`, `--dim`, and `--line` values. `setTheme` emits `theme:changed`, and the Markdown preview debounces a rerender of the active diagrams so both palette previews and persisted theme changes remain readable.
 
 Repository-supplied SVG is still removed by the Markdown sanitizer. Only SVG generated after sanitization by the pinned, strict-mode Mermaid runtime reaches `.md-mermaid`.
 

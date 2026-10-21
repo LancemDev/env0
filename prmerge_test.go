@@ -126,9 +126,9 @@ func TestMergeMessagePrompt(t *testing.T) {
 }
 
 func TestGitSyncPromptPR(t *testing.T) {
-	st := gitSyncState{PR: 9, Branch: "feat", Upstream: "main", Ahead: 2, Behind: 5, ontoRef: "refs/env0/base/9"}
+	st := gitSyncState{PR: 9, Branch: "feat", Upstream: "main", Ahead: 2, Behind: 5, ontoRef: "refs/lx8/base/9"}
 	p := gitSyncPrompt("rebase", st)
-	for _, want := range []string{"Pull request #9", "git rebase refs/env0/base/9", "do not run git fetch", "do not push"} {
+	for _, want := range []string{"Pull request #9", "git rebase refs/lx8/base/9", "do not run git fetch", "do not push"} {
 		if !strings.Contains(p, want) {
 			t.Errorf("rebase prompt missing %q:\n%s", want, p)
 		}
@@ -136,7 +136,7 @@ func TestGitSyncPromptPR(t *testing.T) {
 	if strings.Contains(p, "git fetch refs") {
 		t.Errorf("prompt asks the harness to fetch:\n%s", p)
 	}
-	if p := gitSyncPrompt("merge", st); !strings.Contains(p, `Merge branch 'main' into feat`) || !strings.Contains(p, "refs/env0/base/9") {
+	if p := gitSyncPrompt("merge", st); !strings.Contains(p, `Merge branch 'main' into feat`) || !strings.Contains(p, "refs/lx8/base/9") {
 		t.Errorf("merge prompt:\n%s", p)
 	}
 }

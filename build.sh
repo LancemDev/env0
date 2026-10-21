@@ -1,11 +1,11 @@
 #!/usr/bin/env sh
-# Build env0 for every supported platform into dist/.
+# Build lx8 for every supported platform into dist/.
 set -eu
 
 VERSION=$(cat VERSION | tr -d ' \r\n')
 OUT=${OUT:-dist}
 
-# env0 collects no telemetry, so nothing is injected here.
+# lx8 collects no telemetry, so nothing is injected here.
 LDFLAGS="-s -w"
 
 # Bundle frontend web assets
@@ -26,7 +26,7 @@ for t in $TARGETS; do
   arch=${t#*/}
   ext=""
   [ "$os" = "windows" ] && ext=".exe"
-  name="env0-$VERSION-$os-$arch$ext"
+  name="lx8-$VERSION-$os-$arch$ext"
   printf '  %-28s' "$name"
   CGO_ENABLED=0 GOOS="$os" GOARCH="$arch" \
     go build -trimpath -ldflags="$LDFLAGS" -o "$OUT/$name" .

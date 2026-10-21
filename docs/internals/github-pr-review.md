@@ -1,6 +1,6 @@
 # Git Forge PR Review & Provider Architecture
 
-This document describes the design and implementation of env0's pull request review feature:
+This document describes the design and implementation of lx8's pull request review feature:
 - the `GitProvider` abstraction layer ([`provider.go`](../../provider.go)) and its implementations for GitHub ([`github.go`](../../github.go)), GitLab ([`gitlab.go`](../../gitlab.go)), Gitea / Forgejo ([`gitea.go`](../../gitea.go)) and Bitbucket Cloud ([`bitbucket.go`](../../bitbucket.go)), with the HTTP plumbing the last two share ([`forgehttp.go`](../../forgehttp.go));
 - connecting a forge token from the UI ([`forgeconnect.go`](../../forgeconnect.go));
 - the checkout lifecycle, push/pull, merging and progress reporting ([`pr.go`](../../pr.go)), and merge-base diffing ([`git.go`](../../git.go));
@@ -12,10 +12,10 @@ For the user-facing behaviour, see [Pull Request Review](../features/github-pr-r
 
 ## 1. Zero-Dependency, Process-Scoped Design
 
-Two core env0 tenets shape pull request reviews:
+Two core lx8 tenets shape pull request reviews:
 
-- **Zero-dependency shell-out**: Like `git.go` (which links no Go git library), env0 avoids external forge SDKs. Every provider uses standard Go `net/http` against its forge's REST API, plus an optional shell-out to the forge's CLI for a token (`gh auth token`, `glab config get token`). Checkout itself uses standard `git fetch`, `git worktree add`, or `git clone` via `exec.Command`.
-- **Stateless on disk**: env0 maintains no persistent cache in `~/.env0`. A PR checkout is strictly process-scoped: `checkoutPR` (`pr.go`) places the worktree in `os.MkdirTemp("", "env0-pr-*")`, and `prSession.Close` removes it upon exit (`Ctrl+C` or normal shutdown). This ensures zero leftover disk clutter and prevents stale cache bugs.
+- **Zero-dependency shell-out**: Like `git.go` (which links no Go git library), lx8 avoids external forge SDKs. Every provider uses standard Go `net/http` against its forge's REST API, plus an optional shell-out to the forge's CLI for a token (`gh auth token`, `glab config get token`). Checkout itself uses standard `git fetch`, `git worktree add`, or `git clone` via `exec.Command`.
+- **Stateless on disk**: lx8 maintains no persistent cache in `~/.lx8`. A PR checkout is strictly process-scoped: `checkoutPR` (`pr.go`) places the worktree in `os.MkdirTemp("", "lx8-pr-*")`, and `prSession.Close` removes it upon exit (`Ctrl+C` or normal shutdown). This ensures zero leftover disk clutter and prevents stale cache bugs.
 - **Persisted draft comments**: Draft comments live in `prSession.comments` as a thread-safe, mutex-guarded slice in server memory. Every add, delete and submit also writes them to the workspace session file (see [§6](#6-draft-comments-submission--batch-apply)), so unsubmitted drafts survive a restart of the same review.
 
 ---
@@ -78,14 +78,14 @@ Both use `forgehttp.go`'s `forgeAPI`, which handles one JSON request, decodes a 
   - `HeadRepoCloneURL`, `HeadIsFork`
 
 ### URL Matching & Routing
-Pull requests are opened exclusively via `env0 <url>`. URL routing in `main.go` calls:
+Pull requests are opened exclusively via `lx8 <url>`. URL routing in `main.go` calls:
 ```go
 provider, target, ok := DetectPRURL(arg0)
 ```
 - Iterates over `defaultProviders` in order: GitHub, GitLab, Bitbucket, then Gitea last, because its `<host>/<owner>/<repo>/pulls/<n>` pattern is the loosest. Each provider's URL shape is distinct (`/pull/`, `/-/merge_requests/`, `/pull-requests/`, `/pulls/`), and `TestForgeURLRouting` pins every shape to its provider.
-- If a provider matches and successfully parses the URL, env0 enters PR review mode.
-- Bare numbers (e.g. `env0 123`) and file paths are never mistaken for PR targets; they are processed as regular filesystem paths.
-- Running `env0 pr` outputs an explicit error guiding the user to pass the URL directly.
+- If a provider matches and successfully parses the URL, lx8 enters PR review mode.
+- Bare numbers (e.g. `lx8 123`) and file paths are never mistaken for PR targets; they are processed as regular filesystem paths.
+- Running `lx8 pr` outputs an explicit error guiding the user to pass the URL directly.
 
 ---
 
@@ -106,8 +106,8 @@ sequenceDiagram
     Prov-->>PR: PRMeta (title, refs, state, merged)
     PR->>Git: Local clone exists? (git remote get-url origin)
     alt Local clone, and the forge has a PR head ref
-        PR->>Git: git fetch <PRHeadRef>:refs/env0/pr/n
-        PR->>Git: git worktree add --detach <tmp> refs/env0/pr/n
+        PR->>Git: git fetch <PRHeadRef>:refs/lx8/pr/n
+        PR->>Git: git worktree add --detach <tmp> refs/lx8/pr/n
     else No clone, or no PR head ref (Bitbucket)
         PR->>Git: git clone --filter=blob:none --branch <headRef> <head repo> <tmp>
     end
@@ -124,7 +124,7 @@ sequenceDiagram
 4. `PR #... checked out (<title>)` (or `[merged]` if already merged)
 
 ### Merged PR Handling
-When `meta.Merged` is true, env0 does not block or prompt: it proceeds immediately to check out the PR and surfaces the merged status with a `[merged]` badge in the CLI and a purple `Merged` pill badge in the review header.
+When `meta.Merged` is true, lx8 does not block or prompt: it proceeds immediately to check out the PR and surfaces the merged status with a `[merged]` badge in the CLI and a purple `Merged` pill badge in the review header.
 
 ---
 
@@ -132,7 +132,7 @@ When `meta.Merged` is true, env0 does not block or prompt: it proceeds immediate
 
 ### Token resolution
 
-Each provider's `ResolveToken(cfg, target)` checks env0 Settings, then the environment, then the forge's CLI. The first match wins:
+Each provider's `ResolveToken(cfg, target)` checks lx8 Settings, then the environment, then the forge's CLI. The first match wins:
 
 | Provider | Settings | Environment | CLI | Host scoping |
 | :--- | :--- | :--- | :--- | :--- |
@@ -203,7 +203,7 @@ func gitMergeBase(root, a, b string) string
 ### Drafts and the Session File
 Drafts are held in `prSession.comments` and mirrored to the workspace session file by `sessionManager` ([`session.go`](../../session.go)). Adding or deleting a draft writes `WorkspaceSession.Drafts`; a successful submit clears it. `SetPR` switches the server to the PR's own session file (`newPRSessionManager`), and when `prSession.comments` is empty it loads the saved drafts and advances `nextID` past them.
 
-The file lives at `$XDG_STATE_HOME/env0/sessions/pr-<id>.json`, falling back to `~/.env0/sessions/` or `os.TempDir()/env0-sessions/`. `<id>` is the PR's workbench item ID (`wbPRItem`, from the lowercased `provider/owner/repo#n`), not the base path or checkout root: every opening checks the PR out into a new temporary directory, so a root-keyed file would never be found again. Drafts therefore carry over between runs whether the PR is opened with `env0 <pr-url>` or from the [workbench](workbench.md). If the PR's file has no drafts and the base-path file (`sessionFilePath`, where older versions kept them) does, `SetPR` moves them across.
+The file lives at `$XDG_STATE_HOME/lx8/sessions/pr-<id>.json`, falling back to `~/.lx8/sessions/` or `os.TempDir()/lx8-sessions/`. `<id>` is the PR's workbench item ID (`wbPRItem`, from the lowercased `provider/owner/repo#n`), not the base path or checkout root: every opening checks the PR out into a new temporary directory, so a root-keyed file would never be found again. Drafts therefore carry over between runs whether the PR is opened with `lx8 <pr-url>` or from the [workbench](workbench.md). If the PR's file has no drafts and the base-path file (`sessionFilePath`, where older versions kept them) does, `SetPR` moves them across.
 
 The file also has `tabs`, `active` and `openDirs` fields, and `/api/session` still reads and writes them, but the browser no longer uses them: open tabs and expanded folders are not restored on reload.
 
@@ -227,12 +227,12 @@ A PR checkout is process-scoped (§1) but not read-only: the sidebar git panel (
 
 ### Why the Checkout Needs Its Own Push/Pull
 
-The worktree `checkoutPR` produces sits on a **detached** `HEAD` at `refs/env0/pr/<N>` (§3) — not the PR's branch name, and (in the worktree case) `origin` points at the *base* repository, which for a fork PR is not where the PR's commits live. A bare `git push`/`git pull` would either push nowhere useful or fail outright, so both operations are reimplemented against the PR's actual metadata instead of the checkout's local remote config.
+The worktree `checkoutPR` produces sits on a **detached** `HEAD` at `refs/lx8/pr/<N>` (§3) — not the PR's branch name, and (in the worktree case) `origin` points at the *base* repository, which for a fork PR is not where the PR's commits live. A bare `git push`/`git pull` would either push nowhere useful or fail outright, so both operations are reimplemented against the PR's actual metadata instead of the checkout's local remote config.
 
 ### `prSession.Pull`: Fast-Forward Only, Same as Everywhere Else
 
 1. Refuses immediately if `gitHasUncommittedChanges(worktree)` — nothing here stashes.
-2. Re-fetches the PR head: `git fetch origin <PRHeadRef>:refs/env0/pr/<N>` in the worktree case (shared refs with `srcRepo`, same as the initial checkout), or a direct fetch of `meta.HeadRepoCloneURL`/`meta.HeadRef` into `FETCH_HEAD` in the bare-clone case.
+2. Re-fetches the PR head: `git fetch origin <PRHeadRef>:refs/lx8/pr/<N>` in the worktree case (shared refs with `srcRepo`, same as the initial checkout), or a direct fetch of `meta.HeadRepoCloneURL`/`meta.HeadRef` into `FETCH_HEAD` in the bare-clone case.
 3. `git merge-base --is-ancestor <newRef> HEAD` — if the fetched ref is already an ancestor of the current checkout, it's a no-op ("already up to date"), not an error.
 4. `git merge-base --is-ancestor HEAD <newRef>` — if the current checkout is a clean ancestor of the fetched ref, `git reset --hard <newRef>` fast-forwards it (safe: step 1 already guaranteed a clean working tree).
 5. Otherwise — a local commit the PR head doesn't have, or a force-pushed head that isn't a fast-forward at all — `errPRDiverged` refuses the pull. Exactly like the plain-workspace path, this never invokes `git merge`, so there is never a real conflict to clean up.
@@ -246,13 +246,13 @@ Unlike a formal review submission, Push is not gated on `p.writeAccess` — that
 
 ### Why This Matters for the Checkout's Lifetime
 
-`prSession.Close` (§1) force-removes the worktree and deletes `refs/env0/pr/<N>`/`refs/env0/base/<N>` when the process exits, with no warning if there are uncommitted or unpushed commits sitting in it. Push is the only way work done in a PR checkout survives past the session — the git panel exists in PR review specifically so that loop (edit, commit, push) never requires dropping out to a terminal mid-review.
+`prSession.Close` (§1) force-removes the worktree and deletes `refs/lx8/pr/<N>`/`refs/lx8/base/<N>` when the process exits, with no warning if there are uncommitted or unpushed commits sitting in it. Push is the only way work done in a PR checkout survives past the session — the git panel exists in PR review specifically so that loop (edit, commit, push) never requires dropping out to a terminal mid-review.
 
 ### Bringing the PR Up to Date With Its Base (Agent Rebase)
 
 The git panel's agent rebase/merge flow ([git-integration internals](git-integration.md)) is reused for a PR's base branch rather than duplicated. `/api/git/sync-state`, `/api/git/sync-agent`, and `/api/git/abort` all check `s.pr`:
 
-- `prSyncState` builds the same `gitSyncState`, measured against `prBaseRef(N)` (`refs/env0/base/<N>`) instead of `@{u}`. `PR` carries the number, and `Rewritten` reports whether the checkout's `HEAD` no longer contains the remote PR head (`prSession.Rewritten`). `?fetch=1`, and every dispatch, refresh the base first through `prSession.FetchBase`, a forced fetch with the forge token (the same `fetchPRBase` helper `computeDiffBase` uses).
+- `prSyncState` builds the same `gitSyncState`, measured against `prBaseRef(N)` (`refs/lx8/base/<N>`) instead of `@{u}`. `PR` carries the number, and `Rewritten` reports whether the checkout's `HEAD` no longer contains the remote PR head (`prSession.Rewritten`). `?fetch=1`, and every dispatch, refresh the base first through `prSession.FetchBase`, a forced fetch with the forge token (the same `fetchPRBase` helper `computeDiffBase` uses).
 - `gitSyncPrompt` gets the unexported `ontoRef` and tells the harness to rebase onto (or `git merge -m "Merge branch '<base>' into <head>"`) that ref, with an explicit "already fetched: do not fetch". The no-push and no-`--skip` rules still apply.
 - A rewritten checkout can only reach the PR by a force-push. `/api/git/push` accepts `{"force": true}` in PR sessions only. `prSession.Push(true)` pushes with `--force-with-lease=refs/heads/<head>:<remoteHead>`, so commits pushed by someone else since the checkout cause a refusal instead of being lost. The frontend sends `force` only after the reviewer confirms in the git panel card. After any push, `refreshDiffBase` re-derives the merge-base from the fetched base ref, so a pushed rebase or base merge doesn't fold the base's own changes into "PR changes". `syncPRRefs` then propagates the change to the server and the index.
 - `GitStatusPayload.Rewritten` relabels the Push button to **Force-push**. Pull, Push, and Merge all refuse while a rebase or merge is in progress, and Merge also refuses a rewritten, unpushed checkout, because the forge would otherwise merge the old commits.
@@ -273,10 +273,10 @@ The git panel's agent rebase/merge flow ([git-integration internals](git-integra
   - Toggles `#pr-merged-badge` (purple pill) when `meta.merged` is true.
   - Houses **⚡ Batch Apply** and **Submit Review** controls. `renderBar` gates the verdict buttons through `prmerge.js`'s `reviewGate()`.
 - **Merge UI (`web/src/prmerge.js`)**:
-  - Owns the status pill (`#pr-merge-state`), the split merge button with its method menu (`#pr-merge-group`; the last method is remembered in `localStorage` under `env0.prMergeMethod`), and the merge dialog (`#pr-merge-modal`). It talks only to `/api/pr/merge-*` and has no forge-specific logic.
+  - Owns the status pill (`#pr-merge-state`), the split merge button with its method menu (`#pr-merge-group`; the last method is remembered in `localStorage` under `lx8.prMergeMethod`), and the merge dialog (`#pr-merge-modal`). It talks only to `/api/pr/merge-*` and has no forge-specific logic.
   - Talks to `gitpanel.js` over the bus to avoid an import cycle. It emits `pr:resolve` (fetch the base, then offer rebase or merge), `pr:force-push` (the confirmation card), and `pr:pull`. It listens to `git:sync` (`{running, inProgress, rewritten}`), which drives the pill, the main button, and `reviewGate()`.
 - **Child PR Launching**:
   - Command Palette **Git: Open Pull Request…** posts to `/api/pr/launch`, or, in a workbench child (`S.meta.workbench` set), to the workbench's `/api/wb/open` (see [workbench.md](workbench.md)).
-  - Spawns `env0 -y <url>` in a new detached process on an ephemeral port.
+  - Spawns `lx8 -y <url>` in a new detached process on an ephemeral port.
 - **Git Panel Resync (`web/src/pr.js`'s `refreshPRMeta`)**:
   - Called by `gitpanel.js` after a successful Pull. Re-fetches `/api/pr/meta`, re-renders the PR bar, and re-fetches existing/draft comments, so a PR that moved forward under the reviewer never leaves the bar, diff warning, or comment threads showing the state from session start.

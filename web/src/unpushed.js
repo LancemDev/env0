@@ -3,7 +3,7 @@
 // branch (@{u}..HEAD), each expandable into the files it touched, each file
 // opening that commit's own diff.
 //
-// Before this, env0 could only show the working tree against HEAD, so the
+// Before this, lx8 could only show the working tree against HEAD, so the
 // moment you committed -- even locally -- the change dropped out of view. This
 // section covers the gap between `git commit` and `git push`.
 //

@@ -1,7 +1,7 @@
 .git
 dist/
 bench-repos/
-env0
+lx8
 *.test
 *.prof
 *.out

@@ -8,7 +8,7 @@ import { apiPostJson } from './state.js';
 import { DEFAULT_THEME, chooseThemePreference } from './theme-preference.js';
 import { emit } from './bus.js';
 
-const KEY = 'env0.theme';
+const KEY = 'lx8.theme';
 const THEME_SELECTOR = /^(?::root|html)?\[data-theme=["']?([\w-]+)["']?\]$/;
 
 export { DEFAULT_THEME, chooseThemePreference };

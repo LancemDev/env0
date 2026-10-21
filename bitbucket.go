@@ -21,10 +21,10 @@ import (
 //   - There is no PR head ref to fetch: the checkout clones the source
 //     branch itself, from the fork when there is one.
 //   - The API reports 12-character commit hashes; they are expanded to full
-//     ones, since env0 compares them with what git reports locally.
+//     ones, since lx8 compares them with what git reports locally.
 //   - There is no mergeability field. Conflicts come from the PR's diffstat
 //     ("merge conflict" entries); merge checks surface as a refused merge.
-//   - Merge takes no head-commit guard, so env0 re-reads the PR head right
+//   - Merge takes no head-commit guard, so lx8 re-reads the PR head right
 //     before merging and refuses itself if it moved.
 //   - Tokens come in two kinds: an access token (repository, project or
 //     workspace) sent as a Bearer token, or an Atlassian API token sent with
@@ -50,9 +50,9 @@ func (b *BitbucketProvider) TokenSetup(host string) TokenSetup {
 	return TokenSetup{
 		URL: "https://id.atlassian.com/manage-profile/security/api-tokens",
 		Steps: []string{
-			"Select Create API token with scopes, name it (e.g. env0) and pick an expiry.",
+			"Select Create API token with scopes, name it (e.g. lx8) and pick an expiry.",
 			"Choose Bitbucket as the app.",
-			"Grant read and write access to repositories and pull requests, and read access to your account (env0 uses it to check push access).",
+			"Grant read and write access to repositories and pull requests, and read access to your account (lx8 uses it to check push access).",
 			"Create the token, copy it, and enter your Atlassian account email below.",
 		},
 		Env: "BITBUCKET_TOKEN",
@@ -389,7 +389,7 @@ func bitbucketPages[T any](ctx context.Context, a forgeAPI, path string) ([]T, e
 
 // FetchComments splits inline comments (review threads, replies pointed at
 // the thread's first comment) from general ones. Bitbucket threads general
-// comments too; env0 shows those flat.
+// comments too; lx8 shows those flat.
 func (b *BitbucketProvider) FetchComments(ctx context.Context, t PRTarget, token string) (issue, review []PRComment, err error) {
 	cs, err := bitbucketPages[bbComment](ctx, bitbucketAPI(token), bitbucketPRPath(t)+"/comments?pagelen=100")
 	if err != nil {
@@ -470,7 +470,7 @@ func (b *BitbucketProvider) ReplyToReviewComment(ctx context.Context, t PRTarget
 	return PRComment{}, fmt.Errorf("bitbucket: comment %d not found on pull request #%d", commentID, t.Number)
 }
 
-// bitbucketStrategies maps env0's merge methods onto Bitbucket's strategies,
+// bitbucketStrategies maps lx8's merge methods onto Bitbucket's strategies,
 // most faithful first. A rebase merge is "rebase_fast_forward" where the
 // branch allows it, else a plain fast-forward.
 var bitbucketStrategies = map[string][]string{

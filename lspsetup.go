@@ -20,13 +20,13 @@ import (
 )
 
 // Setting up a language server from the UI: report what is missing for a file,
-// run a known installer for it, and pick the result up without restarting env0.
+// run a known installer for it, and pick the result up without restarting lx8.
 
 // lspInstall is one way to get a language server's binary.
 type lspInstall struct {
 	OS   string   // "darwin", "linux" or "windows"; empty for any
 	Cmd  []string // Cmd[0] is the installer, which must be present to use this
-	Auto bool     // env0 may run it: user-level and non-interactive. Otherwise only shown.
+	Auto bool     // lx8 may run it: user-level and non-interactive. Otherwise only shown.
 }
 
 func (d lspServerDef) installsFor(goos string) []lspInstall {
@@ -39,7 +39,7 @@ func (d lspServerDef) installsFor(goos string) []lspInstall {
 	return out
 }
 
-// registryFor lists every server env0 knows for rel's extension, best first,
+// registryFor lists every server lx8 knows for rel's extension, best first,
 // installed or not.
 func registryFor(rel string) []*lspServerDef {
 	ext := strings.ToLower(filepath.Ext(rel))
@@ -52,7 +52,7 @@ func registryFor(rel string) []*lspServerDef {
 	return out
 }
 
-// MissingLang names the language of rel when env0 knows servers for it but none
+// MissingLang names the language of rel when lx8 knows servers for it but none
 // is installed, and is empty otherwise.
 func (m *lspManager) MissingLang(rel string) string {
 	if !m.enabled || !m.isDiscovered() || m.defFor(rel) != nil {
@@ -116,7 +116,7 @@ func (m *lspManager) Setup(rel string) lspSetup {
 }
 
 // Rescan looks for servers again and forgets earlier start failures, so a server
-// installed while env0 is running is used on the next request.
+// installed while lx8 is running is used on the next request.
 func (m *lspManager) Rescan() {
 	if !m.enabled {
 		return
@@ -178,7 +178,7 @@ func (m *lspManager) Install(name string, option int) (*lspJob, error) {
 	}
 	in := opts[option]
 	if !in.Auto {
-		return nil, fmt.Errorf("env0 does not run %q; run it in a terminal", strings.Join(in.Cmd, " "))
+		return nil, fmt.Errorf("lx8 does not run %q; run it in a terminal", strings.Join(in.Cmd, " "))
 	}
 	tool, ok := lookPathIn(in.Cmd[0], lspBinDirs())
 	if !ok {
@@ -261,7 +261,7 @@ func (t *tailBuffer) String() string {
 // ---------------------------------------------------------------- HTTP
 
 // localPost admits a request that changes the machine only when it is a POST
-// from env0's own page. Browsers send Origin on every POST, so a page from another
+// from lx8's own page. Browsers send Origin on every POST, so a page from another
 // site cannot pass. Requiring the Host to be an IP address or localhost also
 // shuts out DNS rebinding, where an attacker's domain is pointed at this machine
 // and its Origin would otherwise match.
@@ -276,11 +276,11 @@ func localPost(w http.ResponseWriter, r *http.Request) bool {
 	}
 	host = strings.Trim(host, "[]")
 	if host != "localhost" && net.ParseIP(host) == nil {
-		fail(w, http.StatusForbidden, "open env0 by IP address or localhost to set up language servers")
+		fail(w, http.StatusForbidden, "open lx8 by IP address or localhost to set up language servers")
 		return false
 	}
 	if o, err := url.Parse(r.Header.Get("Origin")); err != nil || o.Host != r.Host {
-		fail(w, http.StatusForbidden, "request did not come from env0")
+		fail(w, http.StatusForbidden, "request did not come from lx8")
 		return false
 	}
 	return true

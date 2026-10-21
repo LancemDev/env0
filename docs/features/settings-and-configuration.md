@@ -1,6 +1,6 @@
 # Settings & Configuration System
 
-env0 includes a built-in visual Settings manager modeled after VS Code. Accessible via `Cmd/Ctrl+,` or the gear icon in the status bar, it enables complete customization of editor ergonomics, typography, themes, diff views, and coding agents with live real-time synchronization.
+lx8 includes a built-in visual Settings manager modeled after VS Code. Accessible via `Cmd/Ctrl+,` or the gear icon in the status bar, it enables complete customization of editor ergonomics, typography, themes, diff views, and coding agents with live real-time synchronization.
 
 ---
 
@@ -8,7 +8,7 @@ env0 includes a built-in visual Settings manager modeled after VS Code. Accessib
 
 Developer environments are deeply personal: engineers have strong preferences regarding font sizes, line heights, font families, cursor blink styles, tab spacing, and keybindings. However, managing configuration files manually in text editors or dealing with fragmented config directories can be cumbersome. Furthermore, storing settings inside a workspace repository risks polluting Git commits with personal editor preferences.
 
-env0 stores all configuration in a single per-user global file (`~/.env0/settings.json` or `$XDG_CONFIG_HOME/env0/settings.json`), completely isolated from your repository files. The visual Settings editor offers a dual-mode experience: an intuitive graphical form with interactive pill buttons for quick toggling, and a synchronized raw JSON editor with schema validation. Changes apply immediately in real time without refreshing the browser.
+lx8 stores all configuration in a single per-user global file (`~/.lx8/settings.json` or `$XDG_CONFIG_HOME/lx8/settings.json`), completely isolated from your repository files. The visual Settings editor offers a dual-mode experience: an intuitive graphical form with interactive pill buttons for quick toggling, and a synchronized raw JSON editor with schema validation. Changes apply immediately in real time without refreshing the browser.
 
 ---
 
@@ -93,5 +93,5 @@ For automated machine setup, dotfile repositories, or scripting, you can directl
 ```
 
 The file is stored at:
-- `~/.env0/settings.json`
-- Or `$XDG_CONFIG_HOME/env0/settings.json` (if `XDG_CONFIG_HOME` is set).
+- `~/.lx8/settings.json`
+- Or `$XDG_CONFIG_HOME/lx8/settings.json` (if `XDG_CONFIG_HOME` is set).

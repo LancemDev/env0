@@ -56,7 +56,7 @@ func TestSessionAPIEndpoints(t *testing.T) {
 	}
 
 	// 3. Verify file was written to disk under rev-999.json
-	sessFile := filepath.Join(tmpDir, "env0", "sessions", "rev-999.json")
+	sessFile := filepath.Join(tmpDir, "lx8", "sessions", "rev-999.json")
 	if _, err := os.Stat(sessFile); err != nil {
 		t.Fatalf("session file not found on disk: %v", err)
 	}
@@ -140,7 +140,7 @@ func postDraft(t *testing.T, s *Server, prefix, body string) {
 	}
 }
 
-// A direct `env0 <pr-url>` run has no base path and checks out into a new
+// A direct `lx8 <pr-url>` run has no base path and checks out into a new
 // temporary directory each time; drafts must still come back.
 func TestPRDraftsSurviveNewCheckoutRoot(t *testing.T) {
 	t.Setenv("XDG_STATE_HOME", t.TempDir())
@@ -164,7 +164,7 @@ func TestPRDraftsSurviveNewCheckoutRoot(t *testing.T) {
 	}
 }
 
-// Drafts an older env0 saved under the base-path file move to the PR's file.
+// Drafts an older lx8 saved under the base-path file move to the PR's file.
 func TestPRDraftsMigrateFromBasePathFile(t *testing.T) {
 	t.Setenv("XDG_STATE_HOME", t.TempDir())
 	root := t.TempDir()

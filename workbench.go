@@ -1,9 +1,9 @@
 package main
 
-// The workbench is what a bare `env0` opens: a launcher page listing the
+// The workbench is what a bare `lx8` opens: a launcher page listing the
 // directories and pull requests opened before, with a folder browser and a box
 // for a path or PR URL. It holds no index and no language servers of its own.
-// Every workspace opened from it runs as a child env0 process bound to
+// Every workspace opened from it runs as a child lx8 process bound to
 // 127.0.0.1 on a free port under the base path /w/<id>/, and the workbench
 // reverse-proxies that path to it, so the whole thing is reachable on one port.
 //
@@ -40,7 +40,7 @@ import (
 )
 
 const (
-	wbReadyPrefix  = "env0-ready "     // a child prints this, then its address, once it is listening
+	wbReadyPrefix  = "lx8-ready "     // a child prints this, then its address, once it is listening
 	wbStartTimeout = 3 * time.Minute  // a PR checkout may clone a large repository
 	wbIdleAfter    = 30 * time.Minute // stop a child nobody has had open for this long
 	wbStopGrace    = 5 * time.Second  // how long a child gets to clean up before it is killed
@@ -72,15 +72,15 @@ type wbFile struct {
 }
 
 // workbenchStateDir is where workbench.json and the instance lock live:
-// $XDG_STATE_HOME/env0 when set, otherwise ~/.env0, like the session files.
+// $XDG_STATE_HOME/lx8 when set, otherwise ~/.lx8, like the session files.
 func workbenchStateDir() string {
 	if xdg := os.Getenv("XDG_STATE_HOME"); xdg != "" {
-		return filepath.Join(xdg, "env0")
+		return filepath.Join(xdg, "lx8")
 	}
 	if home, err := os.UserHomeDir(); err == nil && home != "" {
-		return filepath.Join(home, ".env0")
+		return filepath.Join(home, ".lx8")
 	}
-	return filepath.Join(os.TempDir(), "env0")
+	return filepath.Join(os.TempDir(), "lx8")
 }
 
 func workbenchStorePath() string { return filepath.Join(workbenchStateDir(), "workbench.json") }
@@ -111,7 +111,7 @@ func wbPRItem(pt PRTarget) wbItem {
 
 // wbStore reads and writes workbench.json. It keeps no copy in memory: every
 // change re-reads the file first, so entries recorded meanwhile by a plain
-// `env0 <dir>` in another terminal are not overwritten.
+// `lx8 <dir>` in another terminal are not overwritten.
 type wbStore struct {
 	mu   sync.Mutex
 	path string
@@ -220,8 +220,8 @@ func writeFileAtomic(p string, v any) error {
 	return nil
 }
 
-// recordRecent notes a workspace opened outside the workbench (`env0 <dir>`,
-// `env0 <pr-url>`) so it shows up in the workbench later. Best effort.
+// recordRecent notes a workspace opened outside the workbench (`lx8 <dir>`,
+// `lx8 <pr-url>`) so it shows up in the workbench later. Best effort.
 func recordRecent(it wbItem) {
 	st := &wbStore{path: workbenchStorePath()}
 	_ = st.Record(it)
@@ -306,15 +306,15 @@ func (lw *lineWriter) emit(line string) {
 }
 
 // failure picks the line that best explains why a child exited: the last
-// "env0: ..." line fatal() wrote, otherwise the last thing it said.
+// "lx8: ..." line fatal() wrote, otherwise the last thing it said.
 func (c *wbChild) failure() string {
 	c.logMu.Lock()
 	defer c.logMu.Unlock()
 	for i := len(c.log) - 1; i >= 0; i-- {
-		if strings.HasPrefix(c.log[i], "env0: ") {
+		if strings.HasPrefix(c.log[i], "lx8: ") {
 			msg := c.log[i]
-			for strings.HasPrefix(msg, "env0: ") {
-				msg = strings.TrimPrefix(msg, "env0: ")
+			for strings.HasPrefix(msg, "lx8: ") {
+				msg = strings.TrimPrefix(msg, "lx8: ")
 			}
 			return msg
 		}
@@ -324,7 +324,7 @@ func (c *wbChild) failure() string {
 			return s
 		}
 	}
-	return "env0 exited unexpectedly"
+	return "lx8 exited unexpectedly"
 }
 
 type workbench struct {
@@ -416,7 +416,7 @@ func (wb *workbench) start(it wbItem, forget bool) *wbChild {
 		ctx: ctx, cancel: cancel, lastActive: time.Now()}
 	wb.children[it.ID] = c
 	if wb.closing {
-		c.state, c.err = "failed", "env0 is shutting down"
+		c.state, c.err = "failed", "lx8 is shutting down"
 		cancel()
 		close(c.done)
 		return c
@@ -542,7 +542,7 @@ func (wb *workbench) run(c *wbChild, it wbItem, forget bool) {
 	case err := <-exited:
 		msg := c.failure()
 		if err == nil && msg == "" {
-			msg = "env0 exited before it was ready"
+			msg = "lx8 exited before it was ready"
 		}
 		failed(msg)
 		return
@@ -683,7 +683,7 @@ func trustedGet(w http.ResponseWriter, r *http.Request) bool {
 	}
 	host = strings.Trim(host, "[]")
 	if host != "localhost" && net.ParseIP(host) == nil {
-		fail(w, http.StatusForbidden, "open env0 by IP address or localhost")
+		fail(w, http.StatusForbidden, "open lx8 by IP address or localhost")
 		return false
 	}
 	return true
@@ -990,7 +990,7 @@ func (wb *workbench) handleOpen(w http.ResponseWriter, r *http.Request) {
 		Target string `json:"target"`
 		ID     string `json:"id"`
 		// For a PR: the folder of a local clone of its repository, or
-		// "managed" to let env0 clone it. Asked for when none is found.
+		// "managed" to let lx8 clone it. Asked for when none is found.
 		Clone string `json:"clone"`
 	}
 	if err := readJSONBody(r, &body); err != nil {
@@ -1052,7 +1052,7 @@ func (wb *workbench) resolveTarget(target string) (wbItem, error) {
 	}
 	if _, pt, ok := DetectPRURL(target); ok {
 		if gitDisabled {
-			return wbItem{}, errors.New("git is required for PR review; restart env0 without -no-git")
+			return wbItem{}, errors.New("git is required for PR review; restart lx8 without -no-git")
 		}
 		return wbPRItem(pt), nil
 	}
@@ -1243,8 +1243,8 @@ var holdingTmpl = template.Must(template.New("holding").Parse(`<!doctype html>
 <base href="{{.Base}}">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 {{if .Starting}}<meta http-equiv="refresh" content="1; url={{.Self}}">{{end}}
-<title>{{if .Starting}}Opening…{{else}}env0{{end}}</title>
-<link rel="icon" type="image/x-icon" href="https://github.com/LancemDev/env0/favicon.ico">
+<title>{{if .Starting}}Opening…{{else}}lx8{{end}}</title>
+<link rel="icon" type="image/x-icon" href="https://github.com/LancemDev/lx8/favicon.ico">
 <link rel="stylesheet" href="static/style.css">
 <link rel="stylesheet" href="static/themes.css">
 <link rel="stylesheet" href="static/workbench.css">
@@ -1252,8 +1252,8 @@ var holdingTmpl = template.Must(template.New("holding").Parse(`<!doctype html>
 <body class="wb">
 <main class="wb-holding">
   <div class="empty-logo">
-    <img class="logo-dark" src="https://github.com/LancemDev/env0/logo/env0-logo-dark.png" alt="env0" width="160" height="60">
-    <img class="logo-light" src="https://github.com/LancemDev/env0/logo/env0-logo-light.png" alt="env0" width="160" height="60">
+    <img class="logo-dark" src="https://github.com/LancemDev/lx8/logo/lx8-logo-dark.png" alt="lx8" width="160" height="60">
+    <img class="logo-light" src="https://github.com/LancemDev/lx8/logo/lx8-logo-light.png" alt="lx8" width="160" height="60">
   </div>
   {{if .Starting}}
   <p class="wb-holding-msg"><span class="wb-spin" aria-hidden="true"></span>Opening <b>{{.Title}}</b>…</p>
@@ -1282,7 +1282,7 @@ type wbLock struct {
 }
 
 // runningWorkbench returns the URL of a workbench that is already serving,
-// so a second bare `env0` opens it instead of starting another.
+// so a second bare `lx8` opens it instead of starting another.
 func runningWorkbench() string {
 	b, err := os.ReadFile(workbenchLockPath())
 	if err != nil {

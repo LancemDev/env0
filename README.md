@@ -1,4 +1,4 @@
-# env0
+# lx8
 
 **The `.env` editor that runs in your browser.**
 
@@ -7,7 +7,7 @@ on, a local override, a production variant, a template to copy. They are
 scattered through the tree, most of them are ignored by git, and every one of
 them is a list of assignments that you have to edit as text.
 
-env0 is a fast, local-first code navigator built around that one job. It
+lx8 is a fast, local-first code navigator built around that one job. It
 lists every `.env` in the workspace, opens it as a table of keys and values
 instead of a wall of text, and writes your changes to disk on its own.
 
@@ -30,23 +30,23 @@ instead of a wall of text, and writes your changes to disk on its own.
 macOS, Linux and BSD:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/LancemDev/env0/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/LancemDev/lx8/main/install.sh | sh
 ```
 
-That drops a single `env0` binary in `/usr/local/bin` (or `~/.local/bin`) and
+That drops a single `lx8` binary in `/usr/local/bin` (or `~/.local/bin`) and
 prints the address to open. Update an existing install the same way, or:
 
 ```bash
-env0 --update
+lx8 --update
 ```
 
 Build it yourself instead (Go 1.25+ and Node.js or Bun):
 
 ```bash
-git clone https://github.com/LancemDev/env0.git
-cd env0
+git clone https://github.com/LancemDev/lx8.git
+cd lx8
 make build
-install -d ~/.local/bin && install env0 ~/.local/bin/
+install -d ~/.local/bin && install lx8 ~/.local/bin/
 ```
 
 ---
@@ -55,20 +55,20 @@ install -d ~/.local/bin && install env0 ~/.local/bin/
 
 ```bash
 # Open the workbench: pick any directory from one page
-env0
+lx8
 
 # Edit the .env files of the current directory
-env0 .
+lx8 .
 
 # A specific directory or file
-env0 ~/workspace/project
-env0 main.go:42
+lx8 ~/workspace/project
+lx8 main.go:42
 
 # Remote or headless: bind to a network address
-env0 -host 0.0.0.0 -port 7777 ~/workspace
+lx8 -host 0.0.0.0 -port 7777 ~/workspace
 ```
 
-When env0 binds to `0.0.0.0` it prints a `network` address for every
+When lx8 binds to `0.0.0.0` it prints a `network` address for every
 non-loopback IPv4 address on the machine:
 
 ```text
@@ -77,7 +77,7 @@ non-loopback IPv4 address on the machine:
   network:    http://192.168.1.42:7777
 ```
 
-Open the address that is reachable from your machine. env0 never makes a
+Open the address that is reachable from your machine. lx8 never makes a
 network call before serving the first request, and it never phones home.
 
 ---
@@ -141,12 +141,12 @@ Full details: [docs/features/env-editor.md](docs/features/env-editor.md).
 
 ## Everything else
 
-env0 is a complete code navigator, not only an env editor.
+lx8 is a complete code navigator, not only an env editor.
 
-- **Review workbench** -- run `env0` with no arguments to open a launcher for
+- **Review workbench** -- run `lx8` with no arguments to open a launcher for
   directories and pull requests, all on one port.
 - **Pull request review** -- review a PR from GitHub, GitLab, Gitea/Forgejo
-  or Bitbucket Cloud (`env0 <pr-url>`), draft inline comments, and merge.
+  or Bitbucket Cloud (`lx8 <pr-url>`), draft inline comments, and merge.
 - **Fast navigation** -- fuzzy file search (`Cmd/Ctrl+P`), symbol outline
   (`Cmd/Ctrl+Shift+O`), workspace search (`Cmd/Ctrl+Shift+F`), in milliseconds.
 - **Direct file editing** -- edit and save any file in the browser
@@ -188,8 +188,8 @@ The full list is in the help sheet, behind the `?` in the status bar.
 
 ## Configuration
 
-Settings live in `~/.env0/settings.json` (or
-`$XDG_CONFIG_HOME/env0/settings.json`) and are edited from the settings
+Settings live in `~/.lx8/settings.json` (or
+`$XDG_CONFIG_HOME/lx8/settings.json`) and are edited from the settings
 modal at `Cmd/Ctrl+`, which writes the file as you change it.
 
 | Setting | Default | Does |
@@ -203,7 +203,7 @@ modal at `Cmd/Ctrl+`, which writes the file as you change it.
 
 ## Security
 
-env0 binds to `127.0.0.1` by default. It only ever serves files inside the
+lx8 binds to `127.0.0.1` by default. It only ever serves files inside the
 workspace it was pointed at, and it checks that on every request.
 
 Anyone who can reach the address can also **edit** the files in that
@@ -211,7 +211,7 @@ workspace -- that includes your `.env` files. Expose it only over a trusted
 network, and reach it through Tailscale, a VPN or an SSH tunnel rather than
 over the open internet.
 
-`env0 -host 0.0.0.0` prints the network addresses it is reachable on. It
+`lx8 -host 0.0.0.0` prints the network addresses it is reachable on. It
 does not make a network call of any kind before serving the first request, and
 no telemetry is collected.
 
@@ -220,8 +220,8 @@ no telemetry is collected.
 ## Building from source
 
 ```bash
-git clone https://github.com/LancemDev/env0.git
-cd env0
+git clone https://github.com/LancemDev/lx8.git
+cd lx8
 
 make build         # bundle the web assets and build the binary
 make test          # run the test suite
@@ -241,7 +241,7 @@ go run . -dev .
 
 ## Credits
 
-env0 is built on [px0](https://github.com/px0-ai/px0) by Arpit Bhayani, the
+lx8 is built on [px0](https://github.com/px0-ai/px0) by Arpit Bhayani, the
 code navigator and review workbench this project grew out of. The MIT licence
 and the original copyright are kept in [LICENSE](LICENSE).
 

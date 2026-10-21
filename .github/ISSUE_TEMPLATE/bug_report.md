@@ -14,7 +14,7 @@ assignees: ""
 
 ### Reproduction
 
-1. Run `env0 ...`
+1. Run `lx8 ...`
 1. Go to `...`
 1. Notice that `...`
 
@@ -23,11 +23,11 @@ Actual: <!-- What happened instead -->
 
 ### Environment
 
-env0 version: <!-- run `env0 -version` -->
+lx8 version: <!-- run `lx8 -version` -->
 OS: <!-- e.g. Ubuntu 24.04 / macOS Sonoma / Windows 11 -->
 Browser: <!-- e.g. Chrome 128 / Firefox 130 -->
 Workspace size / primary language: <!-- e.g. ~4k files, Go -->
-Repository: <!-- Link to Repo or codebase which you loaded in env0 -->
+Repository: <!-- Link to Repo or codebase which you loaded in lx8 -->
 
 ### Logs & Errors
 

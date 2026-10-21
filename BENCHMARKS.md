@@ -20,7 +20,7 @@ Clones shallow copies (`--depth 1`) of seven diverse open-source repositories:
 
 ### Execute benchmark suite
 
-Spawns an isolated env0 server process per repository, records metrics, and terminates the instance:
+Spawns an isolated lx8 server process per repository, records metrics, and terminates the instance:
 
 ```bash
 ./benchmark.sh
@@ -97,34 +97,34 @@ Measured on macOS (Apple M4, Darwin arm64) with language servers disabled (`-no-
 - `Base Mem`: Resident memory (RSS) after indexing.
 - `Peak Mem`: Peak memory during aggressive search and navigation prior to idle scavenging.
 
-## 5. env0 vs. Editors Comparison
+## 5. lx8 vs. Editors Comparison
 
-Side-by-side comparison on identical Linux hardware across env0 and several other IDE/Editors, focusing on architectural weight and responsiveness constraints:
+Side-by-side comparison on identical Linux hardware across lx8 and several other IDE/Editors, focusing on architectural weight and responsiveness constraints:
 
 ### Multi-Editor Benchmark Matrix
 
 | Editor | Architecture / Process Model | Host / Server RSS | Total System RAM (incl. UI) | Time to Open |
 | :--- | :--- | :--- | :--- | :--- |
-| **env0** | Native Go daemon + Browser client | **~20 - 30 MB** | **~100 - 180 MB** | **~10 ms** |
+| **lx8** | Native Go daemon + Browser client | **~20 - 30 MB** | **~100 - 180 MB** | **~10 ms** |
 | Vim | Native CLI | ~10 - 15 MB | ~10 - 15 MB | ~15 ms |
 | Neovim | Native CLI | ~10 - 20 MB | ~10 - 20 MB | ~150 ms |
 | Zed | Native GUI (Metal / Vulkan) | ~200 - 450 MB | ~200 - 450 MB | *GUI dependent* |
 | Sublime Text | Native GUI (C++) | ~100 - 250 MB | ~100 - 250 MB | *GUI dependent* |
 | VS Code | Electron (Chromium + Node) | ~1,100 - 1,440 MB | ~1,100 - 1,440 MB | ~3.0 - 5.0 s |
 
-*Note: CLI editors (Vim/Neovim) do not provide inline LSP out-of-the-box (like env0 does) without extra processes. Zed and Sublime Text were evaluated as active running GUI configurations. env0 serves a full workspace complete with instantaneous indexing natively in 20-30 Megabytes.*
+*Note: CLI editors (Vim/Neovim) do not provide inline LSP out-of-the-box (like lx8 does) without extra processes. Zed and Sublime Text were evaluated as active running GUI configurations. lx8 serves a full workspace complete with instantaneous indexing natively in 20-30 Megabytes.*
 
 ### Accounting for the Browser Tab (Client/Server Breakdown)
 
-A fair and rigorous evaluation of env0 requires acknowledging its client-server architecture:
+A fair and rigorous evaluation of lx8 requires acknowledging its client-server architecture:
 1. **Host Go Server**: A single static native binary running on the workspace host (~20–30 MB RSS).
 2. **Web Client**: A browser tab running in an existing web browser (Chrome, Firefox, Safari) providing the virtualized UI (~80–150 MB RSS).
 
-Because desktop Electron IDEs (such as VS Code or Cursor) bundle Chromium and Node.js directly into their process tree, comparing only env0's Go server against VS Code's combined tree would be an incomplete comparison without accounting for the browser tab.
+Because desktop Electron IDEs (such as VS Code or Cursor) bundle Chromium and Node.js directly into their process tree, comparing only lx8's Go server against VS Code's combined tree would be an incomplete comparison without accounting for the browser tab.
 
 #### Client/Server Footprint Breakdown vs. VS Code
 
-| Component / Layer | VS Code (Desktop Electron) | VS Code Remote (`code-server`) | env0 (Local Mode) | env0 (Remote Server Mode) |
+| Component / Layer | VS Code (Desktop Electron) | VS Code Remote (`code-server`) | lx8 (Local Mode) | lx8 (Remote Server Mode) |
 | :--- | :--- | :--- | :--- | :--- |
 | **Server / Host Daemon** | ~400–600 MB *(Node.js, Extension Host)* | ~500–1,200 MB *(VS Code Server tree)* | **~20–30 MB** *(Native Go binary)* | **~20–30 MB** *(Host memory only)* |
 | **Client UI / Frontend** | ~700–900 MB *(Bundled Chromium + GPU)* | ~150–300 MB *(Web browser tab)* | **~80–150 MB** *(Single browser tab)* | **~80–150 MB** *(Local client browser)* |
@@ -134,13 +134,13 @@ Because desktop Electron IDEs (such as VS Code or Cursor) bundle Chromium and No
 #### Why this architectural distinction matters:
 
 1. **Total System Memory is Still ~90% Lighter**:
-   Even when adding the browser tab (~80–150 MB) to the Go backend (~20–30 MB), env0's total local system footprint is **~100–180 MB**. Compared to Electron-based IDEs running at ~1,100–1,440 MB, env0 achieves an **85–90% net memory reduction** across the operating system.
+   Even when adding the browser tab (~80–150 MB) to the Go backend (~20–30 MB), lx8's total local system footprint is **~100–180 MB**. Compared to Electron-based IDEs running at ~1,100–1,440 MB, lx8 achieves an **85–90% net memory reduction** across the operating system.
 2. **Remote & Cloud Devboxes**:
-   When working across remote servers, cloud VMs, Kubernetes pods, or devboxes (`env0 -host 0.0.0.0`), the remote machine pays **strictly the ~20–30 MB server cost**. The UI rendering workload is offloaded to the developer's local machine. In contrast, remote solutions like `code-server` run heavy Node.js runtimes and remote daemons directly on the server, consuming 500 MB to 1.2 GB+ of server memory.
+   When working across remote servers, cloud VMs, Kubernetes pods, or devboxes (`lx8 -host 0.0.0.0`), the remote machine pays **strictly the ~20–30 MB server cost**. The UI rendering workload is offloaded to the developer's local machine. In contrast, remote solutions like `code-server` run heavy Node.js runtimes and remote daemons directly on the server, consuming 500 MB to 1.2 GB+ of server memory.
 3. **Marginal Cost of an Existing Browser**:
    Developers virtually always have a browser running with active tabs. Adding one lightweight tab to an already-warm browser process pool avoids the steep CPU and memory penalty of cold-starting a dedicated, isolated Chromium instance, GPU process, and helper daemons.
 4. **Virtualized DOM Keeps the Tab Lean**:
-   env0 does not bundle heavy third-party editor frameworks like Monaco or CodeMirror. The frontend uses a custom virtualized renderer that mounts only ~60 active rows at any time regardless of file size. As a result, the browser tab itself remains bounded (~80–150 MB) and does not balloon when inspecting 500,000-line files or large diffs.
+   lx8 does not bundle heavy third-party editor frameworks like Monaco or CodeMirror. The frontend uses a custom virtualized renderer that mounts only ~60 active rows at any time regardless of file size. As a result, the browser tab itself remains bounded (~80–150 MB) and does not balloon when inspecting 500,000-line files or large diffs.
 
 ### Measured VS Code Process Tree Breakdown (Baseline Contrast)
 
@@ -158,7 +158,7 @@ PID     Role / Component                 RSS (MB)   CPU %
 ...
 ```
 
-In contrast, env0 embeds real-time indexing, fuzzy search, syntax highlighting, language-routing, and server endpoints inside a single, zero-dependency native process.
+In contrast, lx8 embeds real-time indexing, fuzzy search, syntax highlighting, language-routing, and server endpoints inside a single, zero-dependency native process.
 
 ## 6. Memory Scavenging Verification
 
@@ -179,4 +179,4 @@ To observe resident memory scavenging in real time, run:
   30 seconds idle                    57 MB
 ```
 
-After 15 seconds of inactivity, env0 triggers `debug.FreeOSMemory()`, returning unused heap pages back to the Linux kernel and settling back to baseline.
+After 15 seconds of inactivity, lx8 triggers `debug.FreeOSMemory()`, returning unused heap pages back to the Linux kernel and settling back to baseline.

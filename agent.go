@@ -18,10 +18,10 @@ import (
 	"github.com/px0-ai/harness"
 )
 
-// Editing through a coding harness. env0 never authors a change itself: it
+// Editing through a coding harness. lx8 never authors a change itself: it
 // composes an instruction anchored to a line range, hands it to a harness
 // already installed on this machine, and reloads whatever moved once that
-// harness exits. The harness edits; env0 stays the reader that knows exactly
+// harness exits. The harness edits; lx8 stays the reader that knows exactly
 // when to look again.
 //
 // Harnesses are discovered and executed using github.com/px0-ai/harness.
@@ -300,7 +300,7 @@ func (m *agentManager) Select(name string, modelOpt ...string) error {
 	m.mu.Lock()
 	if m.pinned {
 		m.mu.Unlock()
-		return errors.New("env0 was started with -agent, so the harness is fixed for this run")
+		return errors.New("lx8 was started with -agent, so the harness is fixed for this run")
 	}
 	m.mu.Unlock()
 
@@ -936,7 +936,7 @@ func commitMessagePrompt(files []string, stat, diff, instruction string) string 
 // one a previous attempt left half-done. It may run git and edit conflicted
 // files, but must never push: what reaches the remote stays the user's call.
 func gitSyncPrompt(strategy string, st gitSyncState) string {
-	// A PR's base is fetched by env0 itself, with the forge token, into a ref
+	// A PR's base is fetched by lx8 itself, with the forge token, into a ref
 	// of its own; the harness works against that ref and must not fetch.
 	onto, prefetched := st.Upstream, st.ontoRef != ""
 	if prefetched {
@@ -1212,7 +1212,7 @@ func (s *Server) handleAgentBatchEdit(w http.ResponseWriter, r *http.Request) {
 }
 
 // handleAgentJob is polled while an edit runs, once per in-flight compose box.
-// env0 dispatched the harness, so it knows when the work ended without
+// lx8 dispatched the harness, so it knows when the work ended without
 // watching the filesystem for it. id=0 (or missing) means the most recently
 // started job.
 func (s *Server) handleAgentJob(w http.ResponseWriter, r *http.Request) {

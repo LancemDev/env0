@@ -1,6 +1,6 @@
 # CSV & TSV Table View
 
-env0 opens `.csv` and `.tsv` files as a table by default. `Alt+M` switches between the table and the raw source, and your reading position carries across, as it does for the Markdown preview.
+lx8 opens `.csv` and `.tsv` files as a table by default. `Alt+M` switches between the table and the raw source, and your reading position carries across, as it does for the Markdown preview.
 
 ---
 
@@ -15,7 +15,7 @@ The table view lines the columns up, keeps the header row in sight while you scr
 ## Key Capabilities
 
 - **Correct CSV parsing**: Quoted cells can hold commas, quotes and line breaks. Stray quotes in unquoted cells are accepted as literal text instead of failing the file.
-- **Delimiter from the file**: env0 reads the first line and splits on whichever of comma, tab, semicolon or pipe it uses most, ignoring any inside quotes. A tab-separated file named `.csv` or a semicolon export from a European spreadsheet still gets proper columns. The extension only breaks ties (`.csv` → comma, `.tsv` → tab).
+- **Delimiter from the file**: lx8 reads the first line and splits on whichever of comma, tab, semicolon or pipe it uses most, ignoring any inside quotes. A tab-separated file named `.csv` or a semicolon export from a European spreadsheet still gets proper columns. The extension only breaks ties (`.csv` → comma, `.tsv` → tab).
 - **Long text wraps**: A cell is at most about 48 characters wide. Longer text wraps inside the cell and the row grows taller, so one long note doesn't push the other columns off screen.
 - **Sticky header row**: The first row is treated as the header and stays pinned while the table scrolls. A UTF-8 byte order mark at the start of the file is dropped.
 - **Line-number gutter**: The left column shows each row's source line. A row whose quoted cell spans two lines makes the numbering skip (7, then 9), which is what keeps `Cmd/Ctrl+G`, `#L42` links and the source toggle lined up. The gutter sticks while you scroll sideways and is left out when you copy.

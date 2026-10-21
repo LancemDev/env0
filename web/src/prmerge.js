@@ -29,7 +29,7 @@ const METHODS = {
     explain: (n, base) => `The ${pluralize(n, 'commit')} from this branch are replayed onto ${base} one by one, with no merge commit.`,
   },
 };
-const METHOD_KEY = 'env0.prMergeMethod';
+const METHOD_KEY = 'lx8.prMergeMethod';
 
 const pluralize = (n, word) => n + ' ' + word + (n === 1 ? '' : 's');
 const codeHtml = s => '<code>' + esc(s || '') + '</code>';

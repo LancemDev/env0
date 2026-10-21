@@ -8,11 +8,11 @@ import (
 	"sync"
 )
 
-// env0 keeps no state inside a workspace. The user's preferences and choices
-// are stored with the other per-user files env0 writes (~/.env0/settings.json),
+// lx8 keeps no state inside a workspace. The user's preferences and choices
+// are stored with the other per-user files lx8 writes (~/.lx8/settings.json),
 // never in the working tree.
 
-// settings stores user configuration written to ~/.env0/settings.json (or XDG_CONFIG_HOME/env0/settings.json).
+// settings stores user configuration written to ~/.lx8/settings.json (or XDG_CONFIG_HOME/lx8/settings.json).
 // All settings are optional pointers so omitted values fall back to application defaults.
 type settings struct {
 	Agent  string            `json:"agent,omitempty"`
@@ -47,16 +47,16 @@ type settings struct {
 var settingsMu sync.Mutex
 
 // settingsPath mirrors stateFilePath in update.go: honour the XDG location when
-// it is set, otherwise fall back to ~/.env0.
+// it is set, otherwise fall back to ~/.lx8.
 func settingsPath() string {
 	if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
-		return filepath.Join(xdg, "env0", "settings.json")
+		return filepath.Join(xdg, "lx8", "settings.json")
 	}
 	home, err := os.UserHomeDir()
 	if err != nil || home == "" {
 		return ""
 	}
-	return filepath.Join(home, ".env0", "settings.json")
+	return filepath.Join(home, ".lx8", "settings.json")
 }
 
 // settingSchemaItem describes a configurable setting for dynamic rendering in the settings modal.
@@ -381,7 +381,7 @@ var settingsSchema = []settingSchemaItem{
 	{
 		Key:         "github.token",
 		Title:       "GitHub Token",
-		Description: "Personal access token used to check out and review pull requests (env0 <url>). Takes precedence over the GITHUB_TOKEN environment variable and 'gh auth token'.",
+		Description: "Personal access token used to check out and review pull requests (lx8 <url>). Takes precedence over the GITHUB_TOKEN environment variable and 'gh auth token'.",
 		Category:    "GitHub",
 		Type:        "string",
 		Default:     "",
@@ -441,7 +441,7 @@ var settingsSchema = []settingSchemaItem{
 	{
 		Key:         "server.basePath",
 		Title:       "Base Path",
-		Description: "Base URL path prefix for the env0 server and web interface (e.g. /rev-123/).",
+		Description: "Base URL path prefix for the lx8 server and web interface (e.g. /rev-123/).",
 		Category:    "Server",
 		Type:        "string",
 		Default:     "/",
@@ -449,7 +449,7 @@ var settingsSchema = []settingSchemaItem{
 	{
 		Key:         "tips.enabled",
 		Title:       "Show Tips in Interface",
-		Description: "Controls whether env0 periodically shows helpful tips and tricks in the interface.",
+		Description: "Controls whether lx8 periodically shows helpful tips and tricks in the interface.",
 		Category:    "General",
 		Type:        "boolean",
 		Default:     true,

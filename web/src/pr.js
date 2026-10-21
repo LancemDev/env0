@@ -1,5 +1,5 @@
 // web/src/pr.js
-// GitHub PR review: shown only when this process was launched as `env0 pr ...`
+// GitHub PR review: shown only when this process was launched as `lx8 pr ...`
 // (S.meta.pr, set by main.go/pr.go). A persistent bar above the tabs shows
 // the PR and hosts Approve/Request Changes/Comment; selecting a diff line and
 // pressing Alt+R (or the footer/context-menu action) drafts an inline review
@@ -168,7 +168,7 @@ function renderBar() {
 }
 
 // The forge this workspace talks to (GitHub, GitLab, ...), as /api/meta
-// names it; GitHub when unknown, which is what env0 assumed before it knew more.
+// names it; GitHub when unknown, which is what lx8 assumed before it knew more.
 export function forgeInfo() {
   return S.meta?.forge?.info || { label: 'GitHub', tokenKey: 'github.token', tokenCategory: 'GitHub', tokenHint: 'set GITHUB_TOKEN, set GH_TOKEN, or run `gh auth login`' };
 }
@@ -821,8 +821,8 @@ function renderCommentsPanel() {
 /* ---------- launching another PR from a running session ---------- */
 
 // Called from palette.js's "Git: Open Pull Request..." command. Fire and
-// forget: the server re-execs a brand new env0 process (pr.go's
-// handleLaunchPR), which opens its own browser tab the same way any env0
+// forget: the server re-execs a brand new lx8 process (pr.go's
+// handleLaunchPR), which opens its own browser tab the same way any lx8
 // invocation does. A failed checkout only ever shows in that child's own
 // terminal, not here -- see docs/internals/github-pr-review.md.
 export async function launchPR(target) {
@@ -836,7 +836,7 @@ export async function launchPR(target) {
 }
 
 // Inside the workbench the PR becomes one more workspace there, in a new tab,
-// instead of a separate env0 on its own port. The tab is opened before the
+// instead of a separate lx8 on its own port. The tab is opened before the
 // request so the browser still counts it as the user's own action.
 async function launchPRInWorkbench(target) {
   const tab = window.open('about:blank', '_blank');

@@ -333,7 +333,7 @@ func TestBitbucketProvider(t *testing.T) {
 		t.Errorf("squash payload = %v", last)
 	}
 
-	// Bitbucket has no head guard: env0 refuses itself when the head moved.
+	// Bitbucket has no head guard: lx8 refuses itself when the head moved.
 	n := len(rc.writes)
 	if _, err := b.Merge(ctx, tg, "tok", PRMergeRequest{Method: MergeMethodMerge, HeadSHA: "1111111111111111111111111111111111111111"}); !errors.Is(err, ErrPRHeadMoved) {
 		t.Errorf("moved head: %v", err)

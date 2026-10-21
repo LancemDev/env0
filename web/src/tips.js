@@ -58,7 +58,7 @@ export async function setTipsPermanentlyHidden(hidden) {
 }
 
 /**
- * Fetches tips from public URL (e.g. github.com/LancemDev/env0/raw/main/tips.json), falling back to local storage cache or defaults.
+ * Fetches tips from public URL (e.g. github.com/LancemDev/lx8/raw/main/tips.json), falling back to local storage cache or defaults.
  */
 export async function fetchTips() {
   const url = S.settings?.['tips.url'] || TIPS_URL;
@@ -305,7 +305,7 @@ export function initTips() {
   });
 
   $('#btn-refresh-tips')?.addEventListener('click', async () => {
-    showToast('i', 'Fetching latest tips from env0.ai...');
+    showToast('i', 'Fetching latest tips...');
     await fetchTips();
     renderTipsList();
     showToast('i', `Loaded ${loadedTips.length} tips.`);

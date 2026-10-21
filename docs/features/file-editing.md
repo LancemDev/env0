@@ -1,6 +1,6 @@
 # Direct File Editing & Creation
 
-env0 can edit a file in place and create new files and folders from the browser. This is for small, direct changes. Larger or multi-file changes still go through a coding harness (see [Agent Editing](agent-editing.md)).
+lx8 can edit a file in place and create new files and folders from the browser. This is for small, direct changes. Larger or multi-file changes still go through a coding harness (see [Agent Editing](agent-editing.md)).
 
 ---
 

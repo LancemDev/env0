@@ -1,8 +1,8 @@
-# env0 Internal Architecture & Design Documentation
+# lx8 Internal Architecture & Design Documentation
 
-Welcome to the internal engineering documentation for env0, an ultra-lightweight, zero-config code reader and navigator that delegates edits to the user's coding agent, packaged as a single statically-linked binary (~3.5 MB).
+Welcome to the internal engineering documentation for lx8, an ultra-lightweight, zero-config code reader and navigator that delegates edits to the user's coding agent, packaged as a single statically-linked binary (~3.5 MB).
 
-This directory contains in-depth technical write-ups explaining how env0 achieves sub-millisecond startup, instantaneous file navigation, deep code intelligence, and a minimal memory footprint (~20–30 MB RSS) across codebases containing tens of thousands of files.
+This directory contains in-depth technical write-ups explaining how lx8 achieves sub-millisecond startup, instantaneous file navigation, deep code intelligence, and a minimal memory footprint (~20–30 MB RSS) across codebases containing tens of thousands of files.
 
 ## 1. Subsystem Architecture Map
 
@@ -16,7 +16,7 @@ flowchart TD
         Palette["Command Palette & Fuzzy Picker"]
     end
 
-    subgraph GoServer ["env0 Go Backend (HTTP / JSON / Gzip)"]
+    subgraph GoServer ["lx8 Go Backend (HTTP / JSON / Gzip)"]
         Router["HTTP Router & Middleware"]
         Scavenger["Memory Scavenger (FreeOSMemory after 15s)"]
         IndexEngine["In-Memory Index (Paths & Tree Nodes)"]
@@ -69,7 +69,7 @@ The internal documentation is modularized into the following focused guides:
 - [Language Server Protocol (LSP) Architecture](lsp-and-intelligence.md): Lazy on-demand server lifecycle, zero-cost background binary discovery, external path boundary control, stateless call hierarchy trails, in-app installer recipes, and regex fallback.
 - [Git Awareness, Diffing & Stage/Commit/Push/Pull](git-integration.md): CLI shell-out architecture; status/diffing stay read-only, while the sidebar git panel's stage, commit, fast-forward-only pull, and push are explicit, click-triggered writes. Concurrent status generation with indexing, ancestor folder dirty propagation, gutter diff parsing, the client-side split/unified diff renderer, and AI-written commit messages via a file-free harness dispatch.
 - [Pull Request Review & Forge Providers](github-pr-review.md): Extensible `GitProvider` interface with GitHub, GitLab, Gitea/Forgejo and Bitbucket Cloud providers, URL routing, zero-dependency REST clients, host-scoped multi-source token resolution and the Connect dialog's token check, forge-neutral git transport, merge status and merging, agent rebase onto the PR's base with force-with-lease push, animated CLI spinner, interactive merged-PR confirmation, temp-dir worktree checkout scoped to process lifetime, merge-base diffing instead of `HEAD`, fail-closed push-access gating, in-memory draft comment model, AI agent batch-apply integration, and pushing/fast-forward-pulling directly against the PR's own head branch.
-- [Review Workbench](workbench.md): What a bare `env0` serves. One child env0 per workspace behind a single-port reverse proxy, PRs as worktrees of one discovered or env0-made clone per repository, stdin-tied child lifetimes, idle stop, the holding page that restarts stopped workspaces, stable item IDs, the re-read-on-write `workbench.json` store, the single-instance lock, and the filesystem-browsing security model.
+- [Review Workbench](workbench.md): What a bare `lx8` serves. One child lx8 per workspace behind a single-port reverse proxy, PRs as worktrees of one discovered or lx8-made clone per repository, stdin-tied child lifetimes, idle stop, the holding page that restarts stopped workspaces, stable item IDs, the re-read-on-write `workbench.json` store, the single-instance lock, and the filesystem-browsing security model.
 - [Harness Editing & Agent Dispatch](agent-editing.md): The optional agent flow. Starting an edit from the selection bar, right-click menu or diff view, headless invocation contract for Claude Code / Gemini CLI / Cursor Agent, inline failure output, running several edits at once with an overlap guard and an uncommitted-work guard, change detection, the cache/language-server/tab reload path, and the file-free prompt dispatch (`StartPrompt`) behind the git panel's AI commit messages.
 - [Threads](threads.md): Long-running multi-turn conversations with a harness. Native session resume for `claude` and `cursor-agent` with transcript replay for the rest, the stream-json event parser, the SSE feed and its drop-slow-subscriber rule, the on-disk store beside `settings.json`, and why there is no overlap guard.
 
@@ -84,6 +84,6 @@ The internal documentation is modularized into the following focused guides:
 
 ### Operations & Maintenance
 
-- [User Features Documentation](../features/README.md): High-level feature guides, practical workflows, and keyboard shortcuts for all env0 capabilities.
+- [User Features Documentation](../features/README.md): High-level feature guides, practical workflows, and keyboard shortcuts for all lx8 capabilities.
 - [AI Agent Operational Guidelines](../agents/README.md): Engineering principles for AI coding agents, mandatory documentation maintenance protocol, and frontend codebase index.
-- [Publishing & Release Guide](../../PUBLISHING.md): Step-by-step instructions for preparing, testing, and publishing new env0 releases.
+- [Publishing & Release Guide](../../PUBLISHING.md): Step-by-step instructions for preparing, testing, and publishing new lx8 releases.

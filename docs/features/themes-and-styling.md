@@ -1,6 +1,6 @@
 # Themes & Visual Customization
 
-env0 comes pre-packaged with 14 polished color themes spanning popular dark, low-contrast, and light aesthetics. Backed by a strict CSS custom property token architecture, themes provide consistent contrast and visual harmony across code, diff views, Markdown previews, and modals.
+lx8 comes pre-packaged with 14 polished color themes spanning popular dark, low-contrast, and light aesthetics. Backed by a strict CSS custom property token architecture, themes provide consistent contrast and visual harmony across code, diff views, Markdown previews, and modals.
 
 ---
 
@@ -8,13 +8,13 @@ env0 comes pre-packaged with 14 polished color themes spanning popular dark, low
 
 Visual comfort and ergonomic contrast are essential for developers spending long hours auditing code and reviewing diffs. Lighting conditions change throughout the day, and different engineers prefer different palettes—from deep midnight contrast to muted pastel tones or crisp daylight schemes.
 
-env0 provides instant theme switching with zero browser reloading. Themes are implemented using pure CSS custom variables (`var(--bg)`, `var(--fg)`, `var(--accent)`), ensuring that changing a theme updates every element—editor rows, file trees, diff panels, markdown headers, and status badges—cohesively and instantaneously.
+lx8 provides instant theme switching with zero browser reloading. Themes are implemented using pure CSS custom variables (`var(--bg)`, `var(--fg)`, `var(--accent)`), ensuring that changing a theme updates every element—editor rows, file trees, diff panels, markdown headers, and status badges—cohesively and instantaneously.
 
 ---
 
 ## Built-In Themes
 
-env0 ships with 14 curated themes ready for immediate use:
+lx8 ships with 14 curated themes ready for immediate use:
 
 | Theme Name | Identifier | Aesthetic & Style |
 | :--- | :--- | :--- |
@@ -61,7 +61,7 @@ env0 ships with 14 curated themes ready for immediate use:
 2. Navigate to **Workbench: Color Theme** (`workbench.colorTheme`).
 3. Select your preferred theme from the dropdown or click one of the interactive theme pill buttons.
 
-Your choice is saved in `~/.env0/settings.json` and remembered across all future sessions.
+Your choice is saved in `~/.lx8/settings.json` and remembered across all future sessions.
 
 ---
 

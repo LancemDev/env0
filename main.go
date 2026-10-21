@@ -1,4 +1,4 @@
-// Package main implements env0: a fast, local-first code navigator and review
+// Package main implements lx8: a fast, local-first code navigator and review
 // tool that opens any repository or pull request in a responsive browser UI,
 // with a built-in editor for .env files.
 package main
@@ -38,8 +38,8 @@ func main() {
 		noGit        = flag.Bool("no-git", false, "disable git awareness")
 		showVer      = flag.Bool("version", false, "print version and exit")
 		showVerShort = flag.Bool("v", false, "print version and exit (shorthand)")
-		doUpdate     = flag.Bool("update", false, "check for and install latest version of env0")
-		noUpdate     = flag.Bool("no-update", false, "do not auto-update env0 on startup")
+		doUpdate     = flag.Bool("update", false, "check for and install latest version of lx8")
+		noUpdate     = flag.Bool("no-update", false, "do not auto-update lx8 on startup")
 		noColor      = flag.Bool("no-color", false, "disable colour output")
 		quiet        = flag.Bool("quiet", false, "suppress narration")
 		verbose      = flag.Bool("verbose", false, "log startup steps, requests, searches, symbols, and agent prompts to terminal")
@@ -48,10 +48,10 @@ func main() {
 		_            = flag.Bool("y", false, "answer yes to prompts (deprecated; PRs are always opened without prompt)")
 		_            = flag.Bool("yes", false, "answer yes to prompts (alias for -y)")
 		basePathFlag = flag.String("base-path", "", "base URL path prefix to serve endpoints and assets from (e.g. /rev-123/)")
-		wbChild      = flag.Bool("workbench-child", false, "internal: run as a workspace of the env0 workbench")
+		wbChild      = flag.Bool("workbench-child", false, "internal: run as a workspace of the lx8 workbench")
 	)
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "env0 %s - a code navigator with a .env editor\n\nusage:\n  env0 [flags]                      open the workbench\n  env0 [flags] <file or directory>\n  env0 [flags] <pr-url>\n\nflags:\n", version)
+		fmt.Fprintf(os.Stderr, "lx8 %s - a code navigator with a .env editor\n\nusage:\n  lx8 [flags]                      open the workbench\n  lx8 [flags] <file or directory>\n  lx8 [flags] <pr-url>\n\nflags:\n", version)
 		flag.PrintDefaults()
 	}
 	flag.Parse()
@@ -71,7 +71,7 @@ func main() {
 	}
 
 	if *showVer || *showVerShort || (flag.NArg() == 1 && flag.Arg(0) == "version") {
-		fmt.Printf("env0 %s (%s/%s)\n", version, runtime.GOOS, runtime.GOARCH)
+		fmt.Printf("lx8 %s (%s/%s)\n", version, runtime.GOOS, runtime.GOARCH)
 		return
 	}
 
@@ -82,8 +82,8 @@ func main() {
 		return
 	}
 
-	// Without a target, env0 opens the workbench: a launcher for directories
-	// and pull requests that runs each one as a child env0 (workbench.go).
+	// Without a target, lx8 opens the workbench: a launcher for directories
+	// and pull requests that runs each one as a child lx8 (workbench.go).
 	if flag.NArg() == 0 && !*wbChild {
 		var childArgs []string
 		for _, f := range []struct {
@@ -103,7 +103,7 @@ func main() {
 
 	// A full pull or merge request URL (see prURLExamples)
 	// checks out the PR's full source tree instead of resolving a local file/directory.
-	// Only full URLs via "env0 <url>" are supported for PR review.
+	// Only full URLs via "lx8 <url>" are supported for PR review.
 	target := "."
 	var prProvider GitProvider
 	var prTarget PRTarget
@@ -111,7 +111,7 @@ func main() {
 	if flag.NArg() > 0 {
 		arg0 := flag.Arg(0)
 		if arg0 == "pr" {
-			fatal(fmt.Errorf("'env0 pr' is no longer supported; open pull requests directly with: env0 <url>"))
+			fatal(fmt.Errorf("'lx8 pr' is no longer supported; open pull requests directly with: lx8 <url>"))
 		}
 		if provider, pt, ok := DetectPRURL(arg0); ok {
 			prProvider, prTarget, isPR = provider, pt, true
@@ -120,7 +120,7 @@ func main() {
 		}
 	}
 	if isPR && gitDisabled {
-		fatal(fmt.Errorf("env0: git is required for PR review; remove -no-git"))
+		fatal(fmt.Errorf("lx8: git is required for PR review; remove -no-git"))
 	}
 
 	var pr *prSession
@@ -145,7 +145,7 @@ func main() {
 		cancel()
 		if err != nil {
 			sp.Fail(fmt.Sprintf("Failed to prepare PR #%d: %v", prTarget.Number, err))
-			fatal(fmt.Errorf("env0: %w", err))
+			fatal(fmt.Errorf("lx8: %w", err))
 		}
 		if p.meta.Merged {
 			sp.Success(fmt.Sprintf("PR #%d checked out [merged] (%s)", prTarget.Number, p.meta.Title))
@@ -213,7 +213,7 @@ func main() {
 	}
 
 	url := viewerURL(addr, initialFile, initialLine, configuredBasePath)
-	uiHeading("env0 "+version, nil, os.Stdout)
+	uiHeading("lx8 "+version, nil, os.Stdout)
 	if pr != nil {
 		prTitle := fmt.Sprintf("#%d %s", pr.meta.Number, pr.meta.Title)
 		if pr.meta.Merged {
@@ -292,7 +292,7 @@ func main() {
 	}()
 
 	// Check for updates in the background once the server is already up, so
-	// env0 never makes a network call before serving the first request.
+	// lx8 never makes a network call before serving the first request.
 	if !*noUpdate {
 		go autoUpdate(version)
 	}
@@ -315,7 +315,7 @@ func main() {
 		<-stop
 		interrupted = true
 		fmt.Print("\r")
-		uiStatus("info", "env0 stopped", "", 0, os.Stderr)
+		uiStatus("info", "lx8 stopped", "", 0, os.Stderr)
 		go func() {
 			<-stop // Second interrupt forces immediate exit
 			os.Exit(130)
@@ -385,7 +385,7 @@ func runWorkbench(host string, port int, basePathFlag string, open, update bool,
 	writeWorkbenchLock(viewerURL(net.JoinHostPort("127.0.0.1", boundPort), "", 0, basePath))
 	defer removeWorkbenchLock()
 
-	uiHeading("env0 "+version, nil, os.Stdout)
+	uiHeading("lx8 "+version, nil, os.Stdout)
 	uiKV("workbench", uiAccent(u, os.Stdout), 11, os.Stdout)
 	if host == "0.0.0.0" {
 		for _, networkURL := range networkURLs(addr, "", 0) {
@@ -410,7 +410,7 @@ func runWorkbench(host string, port int, basePathFlag string, open, update bool,
 		<-stop
 		interrupted = true
 		fmt.Print("\r")
-		uiStatus("info", "env0 stopped", "", 0, os.Stderr)
+		uiStatus("info", "lx8 stopped", "", 0, os.Stderr)
 		go func() {
 			<-stop
 			os.Exit(130)
@@ -683,6 +683,6 @@ func isWSL() bool {
 }
 
 func fatal(err error) {
-	fmt.Fprintln(os.Stderr, "env0:", err)
+	fmt.Fprintln(os.Stderr, "lx8:", err)
 	os.Exit(1)
 }

@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-// Only a POST from env0's own page, addressed by IP or localhost, may install.
+// Only a POST from lx8's own page, addressed by IP or localhost, may install.
 func TestLocalPost(t *testing.T) {
 	cases := []struct {
 		name, method, host, origin string
@@ -40,7 +40,7 @@ func TestLocalPost(t *testing.T) {
 // A binary outside PATH is still found in one of the extra folders.
 func TestLookPathInExtraDir(t *testing.T) {
 	dir := t.TempDir()
-	name := "env0-test-fake-language-server"
+	name := "lx8-test-fake-language-server"
 	file := name
 	if runtime.GOOS == "windows" {
 		file += ".exe"
@@ -56,7 +56,7 @@ func TestLookPathInExtraDir(t *testing.T) {
 	}
 }
 
-// Every recipe is well formed, and nothing env0 runs by itself asks for root.
+// Every recipe is well formed, and nothing lx8 runs by itself asks for root.
 func TestInstallRecipes(t *testing.T) {
 	for _, def := range lspRegistry {
 		if def.Lang == "" {
@@ -84,7 +84,7 @@ func TestInstallRefusals(t *testing.T) {
 		t.Error("Install with language servers disabled succeeded")
 	}
 	m := &lspManager{enabled: true}
-	if _, err := m.Install("env0-no-such-server", 0); err == nil {
+	if _, err := m.Install("lx8-no-such-server", 0); err == nil {
 		t.Error("Install of an unknown server succeeded")
 	}
 	if _, err := m.Install("gopls", 99); err == nil {

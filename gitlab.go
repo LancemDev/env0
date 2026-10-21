@@ -59,7 +59,7 @@ func (g *GitLabProvider) TokenSetup(host string) TokenSetup {
 	return TokenSetup{
 		URL: "https://" + host + "/-/user_settings/personal_access_tokens",
 		Steps: []string{
-			"Select Add new token, name it (e.g. env0) and pick an expiration date.",
+			"Select Add new token, name it (e.g. lx8) and pick an expiration date.",
 			"Under Select scopes, check api.",
 			"Create the token and copy it.",
 		},
@@ -261,7 +261,7 @@ func gitlabGetAllPages(ctx context.Context, t PRTarget, path, token string) ([]j
 	return all, nil
 }
 
-// glMR is the subset of a merge request env0 reads.
+// glMR is the subset of a merge request lx8 reads.
 type glMR struct {
 	IID                 int    `json:"iid"`
 	Title               string `json:"title"`
@@ -320,7 +320,7 @@ func (g *GitLabProvider) FetchPR(ctx context.Context, t PRTarget, token string) 
 	if mr.State != "opened" {
 		m.State = "closed"
 	}
-	// A fork's commits live in its own project; env0 pushes there.
+	// A fork's commits live in its own project; lx8 pushes there.
 	if mr.SourceProjectID != 0 && mr.SourceProjectID != mr.TargetProjectID {
 		m.HeadIsFork = true
 		var src struct {
@@ -372,9 +372,9 @@ func (g *GitLabProvider) CheckPushAccess(ctx context.Context, t PRTarget, token 
 	return level >= gitlabDeveloper
 }
 
-// SubmitReview maps env0's one-shot review onto GitLab's separate calls: each
+// SubmitReview maps lx8's one-shot review onto GitLab's separate calls: each
 // draft becomes a diff discussion (or, where GitLab can't anchor it -- an
-// unchanged context line needs both old and new line numbers, which env0's
+// unchanged context line needs both old and new line numbers, which lx8's
 // drafts don't carry -- a note naming path:line), the body a note, and the
 // verdict an approval or, for REQUEST_CHANGES, a withdrawn approval.
 func (g *GitLabProvider) SubmitReview(ctx context.Context, t PRTarget, token, headSHA string, comments []prComment, event, body string) error {
@@ -495,7 +495,7 @@ func (g *GitLabProvider) discussions(ctx context.Context, t PRTarget, token stri
 
 // FetchComments flattens discussions: one anchored to a diff line is a
 // review thread (its replies point at the first note), anything else --
-// including a threaded general discussion, which env0 shows flat -- is a list
+// including a threaded general discussion, which lx8 shows flat -- is a list
 // of top-level comments. GitLab's system notes ("added 2 commits") are skipped.
 func (g *GitLabProvider) FetchComments(ctx context.Context, t PRTarget, token string) (issue, review []PRComment, err error) {
 	ds, err := g.discussions(ctx, t, token)

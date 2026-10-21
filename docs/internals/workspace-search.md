@@ -1,10 +1,10 @@
 # Workspace Search & Symbol Extraction
 
-This document explains env0's high-throughput parallel search engine ([`search.go`](../../search.go)) and fast regex symbol extractor ([`symbols.go`](../../symbols.go)).
+This document explains lx8's high-throughput parallel search engine ([`search.go`](../../search.go)) and fast regex symbol extractor ([`symbols.go`](../../symbols.go)).
 
 ## 1. Search Engine Architecture
 
-Full-text search in env0 is built to scan hundreds of megabytes of source code in milliseconds without spawning external processes (like `grep` or `ripgrep`) and without thrashing the Go heap.
+Full-text search in lx8 is built to scan hundreds of megabytes of source code in milliseconds without spawning external processes (like `grep` or `ripgrep`) and without thrashing the Go heap.
 
 ```mermaid
 flowchart TD
@@ -37,7 +37,7 @@ flowchart TD
 
 ## 2. Memory Optimization: `workBuf` Pooling
 
-Reading thousands of files off disk can overwhelm Go's memory allocator if buffers are created per file. env0 eliminates per-file allocations using a `sync.Pool` of reusable worker buffers:
+Reading thousands of files off disk can overwhelm Go's memory allocator if buffers are created per file. lx8 eliminates per-file allocations using a `sync.Pool` of reusable worker buffers:
 
 ```go
 type workBuf struct {
@@ -67,7 +67,7 @@ For case-insensitive literal searches, converting full UTF-8 strings with `strin
 
 The vast majority of files in any repository do not contain the search term. Splitting file contents into lines and iterating line-by-line is expensive.
 
-env0 applies an instant rejection test before doing any line parsing:
+lx8 applies an instant rejection test before doing any line parsing:
 
 ```go
 if !isRegex && !caseSensitive {
@@ -108,7 +108,7 @@ type Match struct {
 
 ## 5. Regex Symbol Extraction ([`symbols.go`](../../symbols.go))
 
-When language servers are disabled or unavailable, env0 provides instantaneous symbol outlines and declaration jump navigation via heuristic regular expressions.
+When language servers are disabled or unavailable, lx8 provides instantaneous symbol outlines and declaration jump navigation via heuristic regular expressions.
 
 ### Parallel Symbol Flagging
 

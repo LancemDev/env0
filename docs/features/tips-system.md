@@ -1,24 +1,24 @@
 # Tips & Tricks System
 
-env0 includes an interactive tips and tricks system designed to introduce developers to powerful keyboard shortcuts, Git workflows, review capabilities, and editor features without obstructing startup.
+lx8 includes an interactive tips and tricks system designed to introduce developers to powerful keyboard shortcuts, Git workflows, review capabilities, and editor features without obstructing startup.
 
 ---
 
 ## Overview & Architecture
 
-Unlike heavy IDEs that display large intrusive modals on startup, env0 loads tips asynchronously in the background.
+Unlike heavy IDEs that display large intrusive modals on startup, lx8 loads tips asynchronously in the background.
 
 - **Non-Intrusive Floating Widget**: Appears gently in the bottom-right corner after an initial delay (~1.8 seconds), presenting one tip at a time with previous/next navigation and automatic progression.
 - **Dedicated Tips Section in IDE**: An inspector tab labeled **Tips** (`#pane-right-tips`) displays all available tips in a searchable, filterable list directly alongside your code.
 - **Left Bottom Bar Help Button**: The `#btn-help` button in the sidebar footer (`side-foot`) navigates directly to the Tips section in the inspector.
-- **Public URL Delivery**: Tips are loaded live from `https://github.com/LancemDev/env0/tips.json` (hosted in the `../web` repository) and cached locally, with built-in offline fallbacks (`web/src/tips-util.js`).
+- **Public URL Delivery**: Tips are loaded live from `https://github.com/LancemDev/lx8/tips.json` (hosted in the `../web` repository) and cached locally, with built-in offline fallbacks (`web/src/tips-util.js`).
 - **Permanent Dismissal**: Users can permanently hide the floating tip popups at any time via the "Don't show tips" button, the inspector checkbox, or the `tips.enabled` preference in Settings (`Cmd/Ctrl+,`).
 
 ---
 
 ## How to Access Tips
 
-1. **Floating Tip Widget**: Automatically appears shortly after opening env0 unless permanently hidden. Use **‹** and **›** to browse tips one after another.
+1. **Floating Tip Widget**: Automatically appears shortly after opening lx8 unless permanently hidden. Use **‹** and **›** to browse tips one after another.
 2. **Help Button**: Click the question mark icon in the left bottom bar (beside the theme and settings buttons) to open the Tips inspector panel.
 3. **Inspector Tab**: Click the **Tips** tab in the right-side inspector header.
 4. **Command Palette**: Press **`Cmd/Ctrl + Shift + P`** and choose **Help: Tips & Tricks (All Tips)** or **Help: Show Tip**.
@@ -53,9 +53,9 @@ Each tip is a JSON object with the following fields:
    Run `npm run build` in `../web` to verify the Astro static site compiles cleanly.
 
 2. **Add to Built-in Fallbacks**:
-   Add the identical entry to `DEFAULT_TIPS` in `web/src/tips-util.js` within `env0` so the tip is available offline.
+   Add the identical entry to `DEFAULT_TIPS` in `web/src/tips-util.js` within `lx8` so the tip is available offline.
 
 3. **Verify and Rebuild**:
-   - Run `npm test` in `env0` to run the frontend unit tests.
+   - Run `npm test` in `lx8` to run the frontend unit tests.
    - Run `npm run check` and `npm run build` to rebuild `web/app.js`.
    - Run `go test ./...` and `make build`.

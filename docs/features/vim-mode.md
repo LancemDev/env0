@@ -1,6 +1,6 @@
 # Vim Keybindings & Modal Navigation
 
-env0 includes an optional Vim modal navigation mode. When enabled, it provides standard modal navigation—Normal mode, Visual mode, and intuitive motions—allowing engineers accustomed to Vim, Neovim, or Helix to navigate documents entirely from the home row.
+lx8 includes an optional Vim modal navigation mode. When enabled, it provides standard modal navigation—Normal mode, Visual mode, and intuitive motions—allowing engineers accustomed to Vim, Neovim, or Helix to navigate documents entirely from the home row.
 
 ---
 
@@ -8,7 +8,7 @@ env0 includes an optional Vim modal navigation mode. When enabled, it provides s
 
 Many developers maintain decades of muscle memory built around modal text editing. Moving your hand away from the keyboard to grab a mouse or repeatedly pressing arrow keys disrupts cognitive momentum.
 
-env0's Vim mode brings the speed and ergonomics of modal motions into the code viewer. Because env0 is focused on code reading and auditing, Vim mode focuses on navigation, scrolling, line jumping, and range selection. When you highlight text in Visual mode, the selection immediately bridges into env0's context actions—allowing you to press `Alt+C` to copy a reference, `Alt+A` to copy formatted context for an LLM, or `Alt+E` to dispatch an edit to your coding agent.
+lx8's Vim mode brings the speed and ergonomics of modal motions into the code viewer. Because lx8 is focused on code reading and auditing, Vim mode focuses on navigation, scrolling, line jumping, and range selection. When you highlight text in Visual mode, the selection immediately bridges into lx8's context actions—allowing you to press `Alt+C` to copy a reference, `Alt+A` to copy formatted context for an LLM, or `Alt+E` to dispatch an edit to your coding agent.
 
 ---
 
@@ -59,7 +59,7 @@ Vim mode can be enabled in Settings:
 2. Locate **Editor: Vim Mode** (`editor.vimMode`).
 3. Click the `[true]` pill button to activate it immediately.
 
-Alternatively, set `"editor.vimMode": true` in `~/.env0/settings.json`.
+Alternatively, set `"editor.vimMode": true` in `~/.lx8/settings.json`.
 
 ---
 

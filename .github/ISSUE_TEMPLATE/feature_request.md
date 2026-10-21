@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Propose a feature, enhancement, or capability for env0
+about: Propose a feature, enhancement, or capability for lx8
 title: "[FEATURE] "
 labels: ["enhancement"]
 assignees: ""

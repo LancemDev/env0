@@ -1,6 +1,6 @@
 # File Explorer & Workspace Management
 
-env0 includes a high-density file tree sidebar and multi-tab document manager. Designed for rapid spatial orientation across large directory trees, it features compact directory collapsing, Git status badging, automatic file revelation, and keyboard tab management.
+lx8 includes a high-density file tree sidebar and multi-tab document manager. Designed for rapid spatial orientation across large directory trees, it features compact directory collapsing, Git status badging, automatic file revelation, and keyboard tab management.
 
 ---
 
@@ -8,13 +8,13 @@ env0 includes a high-density file tree sidebar and multi-tab document manager. D
 
 Navigating deeply nested package structures (such as `src/main/java/com/company/project/controllers/...` or deeply nested monorepo packages) often clutters file sidebars with endless single-child folders, forcing developers to click repeatedly just to reach a single source file. Furthermore, cluttered sidebars make it difficult to distinguish between active project files and ignored artifacts (such as build outputs, test coverage dumps, or `node_modules`).
 
-env0's file explorer eliminates unnecessary clicks by automatically collapsing single-child directory chains into a single line (e.g., `src/core/auth/`). It honors your `.gitignore` configuration automatically—dimming ignored files and omitting them from searches while keeping the tree clean. Paired with a versatile tab bar, you can manage multiple documents and switch contexts effortlessly.
+lx8's file explorer eliminates unnecessary clicks by automatically collapsing single-child directory chains into a single line (e.g., `src/core/auth/`). It honors your `.gitignore` configuration automatically—dimming ignored files and omitting them from searches while keeping the tree clean. Paired with a versatile tab bar, you can manage multiple documents and switch contexts effortlessly.
 
 ---
 
 ## Key Capabilities
 
-- **Compact Single-Child Folder Chains**: When a directory contains only a single subdirectory (common in Java, Go, and modular TypeScript architectures), env0 collapses the entire chain into a single combined entry (`internal/service/auth`). Clicking expands the entire chain in one click.
+- **Compact Single-Child Folder Chains**: When a directory contains only a single subdirectory (common in Java, Go, and modular TypeScript architectures), lx8 collapses the entire chain into a single combined entry (`internal/service/auth`). Clicking expands the entire chain in one click.
 - **Git Status Decorators**: Files with unstaged or staged modifications display color-coded status badges (`M`, `A`, `D`, `U`, `R`), with dirty status propagating up parent directory branches.
 - **Gitignore Awareness & Dimming**: Files and folders ignored by `.gitignore` rules (such as `dist/`, `build/`, `vendor/`, `node_modules`) are visually dimmed in the tree and excluded from background search indexes.
 - **Auto-Reveal Active File**: Opening a file via fuzzy search (`Cmd/Ctrl+P`) or Go to Definition (`F12`) automatically scrolls the sidebar tree to reveal and highlight the active file.

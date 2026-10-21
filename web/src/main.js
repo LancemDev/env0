@@ -76,7 +76,7 @@ initPRScope();
     initTheme();
 
     // Restore word wrap (default ON)
-    const wrapPref = localStorage.getItem('env0.wrap');
+    const wrapPref = localStorage.getItem('lx8.wrap');
     S.wrap = wrapPref !== null ? wrapPref === 'true' : true;
     document.body.classList.toggle('word-wrap', S.wrap);
 
@@ -85,9 +85,9 @@ initPRScope();
     document.body.classList.remove('hide-lines');
 
     // Restore Markdown preview (default ON)
-    const mdPref = localStorage.getItem('env0.mdPreview');
+    const mdPref = localStorage.getItem('lx8.mdPreview');
     S.mdPreview = mdPref !== null ? mdPref === 'true' : true;
-    const tablePref = localStorage.getItem('env0.tablePreview');
+    const tablePref = localStorage.getItem('lx8.tablePreview');
     S.tablePreview = tablePref !== null ? tablePref === 'true' : true;
 
     updateEditorOptionControls();
@@ -103,7 +103,7 @@ initPRScope();
   applyAgentMeta();
   initPR();
   showRightInspector(); // the right sidebar starts open, on Threads when there is a harness
-  document.title = S.meta.name + ' - env0';
+  document.title = S.meta.name + ' - lx8';
   $('#root-name').textContent = S.meta.name;
   $('#root-name').title = S.meta.root;
   if (S.meta.workbench) {
@@ -111,8 +111,8 @@ initPRScope();
     const back = document.createElement('a');
     back.className = 'mini wb-back';
     back.href = S.meta.workbench;
-    back.title = 'Back to the env0 workbench';
-    back.setAttribute('aria-label', 'Back to the env0 workbench');
+    back.title = 'Back to the lx8 workbench';
+    back.setAttribute('aria-label', 'Back to the lx8 workbench');
     back.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>';
     $('#root-name').before(back);
   }
@@ -122,7 +122,7 @@ initPRScope();
     const stVerEl = $('#st-ver');
     if (stVerEl) {
       stVerEl.textContent = 'v' + S.meta.version;
-      stVerEl.title = `env0 v${S.meta.version} (Click for shortcuts & help)`;
+      stVerEl.title = `lx8 v${S.meta.version} (Click for shortcuts & help)`;
     }
   }
   updateStatus();
@@ -133,7 +133,7 @@ initPRScope();
   // Split into helpers so the readiness poll below can redo this once the
   // background indexer (main.go's `go ix.Build()`) finishes: gitChanges/
   // gitFiles are zero until then, so a session that loads before indexing
-  // completes (common right after `env0 <pr-url>`) would otherwise never
+  // completes (common right after `lx8 <pr-url>`) would otherwise never
   // auto-select a diff tab -- until the next manual reload.
   const applyGitSidebarState = async () => {
     // The unpushed list decides this too: a clean tree with local commits

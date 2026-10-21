@@ -32,10 +32,10 @@ test('renderTipMarkdown formats bold, italic, code, and escapes html', () => {
 });
 
 test('renderTipMarkdown formats links securely', () => {
-  const input = 'Visit [env0](https://github.com/LancemDev/env0) for more info.';
+  const input = 'Visit [lx8](https://github.com/LancemDev/lx8) for more info.';
   const output = renderTipMarkdown(input);
 
-  assert.ok(output.includes('<a href="https://github.com/LancemDev/env0" target="_blank" rel="noopener noreferrer" class="tip-link">env0</a>'));
+  assert.ok(output.includes('<a href="https://github.com/LancemDev/lx8" target="_blank" rel="noopener noreferrer" class="tip-link">lx8</a>'));
 });
 
 test('renderTipMarkdown formats kbd and KBD tags as styled HTML', () => {

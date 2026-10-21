@@ -1,6 +1,6 @@
 # Editor Virtualization & Caret Engine
 
-This document provides a comprehensive technical breakdown of env0's bespoke virtualized code viewer, caret engine, and selection preservation system ([`web/src/renderer.js`](../../web/src/renderer.js), [`web/src/cursor.js`](../../web/src/cursor.js), and [`web/style.css`](../../web/style.css)).
+This document provides a comprehensive technical breakdown of lx8's bespoke virtualized code viewer, caret engine, and selection preservation system ([`web/src/renderer.js`](../../web/src/renderer.js), [`web/src/cursor.js`](../../web/src/cursor.js), and [`web/style.css`](../../web/style.css)).
 
 The sidebar file tree uses a separate on-demand rendering path in [`web/src/tree.js`](../../web/src/tree.js). Its Expand All control loads indexed directory children in batches of four requests, skips ignored subtrees, and can be cancelled without allowing late responses to reopen collapsed folders. The editor viewport virtualization described below runs independently of the sidebar tree state.
 
@@ -14,7 +14,7 @@ General-purpose browser code editors (such as Monaco, CodeMirror 6, or Ace) are 
 - Their initialization latency takes hundreds of milliseconds.
 - Complex DOM representations degrade frame rates when scrolling large files.
 
-Because env0 is a code inspection and navigation tool that does not edit text in the virtualized surface (direct edits use a separate textarea view, see [File Editing](file-editing.md); larger changes go through a coding harness), it bypasses heavy third-party editor runtimes entirely. Instead, it implements a custom, high-performance virtualized surface with a fixed DOM footprint (~60 active nodes) and sub-millisecond paint budgets. This architectural choice keeps the frontend browser tab's RAM strictly bounded (~80–150 MB), ensuring that the combined client-server footprint (~100–180 MB) remains an order of magnitude leaner than Electron IDEs without suffering memory creep on large files.
+Because lx8 is a code inspection and navigation tool that does not edit text in the virtualized surface (direct edits use a separate textarea view, see [File Editing](file-editing.md); larger changes go through a coding harness), it bypasses heavy third-party editor runtimes entirely. Instead, it implements a custom, high-performance virtualized surface with a fixed DOM footprint (~60 active nodes) and sub-millisecond paint budgets. This architectural choice keeps the frontend browser tab's RAM strictly bounded (~80–150 MB), ensuring that the combined client-server footprint (~100–180 MB) remains an order of magnitude leaner than Electron IDEs without suffering memory creep on large files.
 
 ## 2. DOM Surface Hierarchy
 
@@ -110,7 +110,7 @@ export function render() {
 
 Proportional gutter widths and accurate scroll geometry require exact character dimensions. However, querying DOM layout properties (`offsetWidth`, `getBoundingClientRect`) during rendering triggers costly browser layout thrashing.
 
-Instead, env0 measures typography once via an offscreen DOM element (`#measure`):
+Instead, lx8 measures typography once via an offscreen DOM element (`#measure`):
 
 - `LH` (Line Height) and `chW` (Character Width) are measured with sub-pixel fractional precision.
 - Values are cached in state `S.chW` and `S.LH`.
@@ -120,7 +120,7 @@ Instead, env0 measures typography once via an offscreen DOM element (`#measure`)
 
 A major pitfall of virtualized DOMs is that rebuilding or recycling `.row` elements drops the browser's active native text selection (e.g., when scrolling or refreshing background syntax highlighting).
 
-env0 solves this with Coordinate-Based Selection Persistence:
+lx8 solves this with Coordinate-Based Selection Persistence:
 
 ```mermaid
 sequenceDiagram
@@ -144,7 +144,7 @@ sequenceDiagram
 
 ## 6. Decoupled Overlay Caret (`placeCaret()`)
 
-Unlike traditional editors that insert a cursor DOM element inside code lines, env0's caret is decoupled:
+Unlike traditional editors that insert a cursor DOM element inside code lines, lx8's caret is decoupled:
 
 - The `#caret` element lives as a direct child of `#sizer`.
 - `placeCaret(line, col)` computes the collapsed range geometry using `toPoint(line, col)`.

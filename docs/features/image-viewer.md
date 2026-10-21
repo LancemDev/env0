@@ -1,6 +1,6 @@
 # Image Viewer & Asset Inspection
 
-env0 includes a dedicated image viewing canvas and inspection toolset. It treats visual assets as first-class documents alongside source code and Markdown files, providing interactive zoom, pan, background contrast modes, and an inline Markdown lightbox.
+lx8 includes a dedicated image viewing canvas and inspection toolset. It treats visual assets as first-class documents alongside source code and Markdown files, providing interactive zoom, pan, background contrast modes, and an inline Markdown lightbox.
 
 ---
 
@@ -8,13 +8,13 @@ env0 includes a dedicated image viewing canvas and inspection toolset. It treats
 
 Modern software repositories increasingly contain visual assets: UI design mockups, architectural diagrams, vector SVG icons, charts, favicons, and generated media assets. Furthermore, AI coding agents frequently generate diagrams or UI screenshots as part of documentation and feature development.
 
-Switching back and forth between a code reader and external image preview tools breaks concentration. env0 provides first-class support for opening image files directly in editor tabs. With precise zoom controls (up to 3200%), transparency background toggles, and pixelation options, developers can inspect graphics, verify icon alignment, and audit visual changes without leaving their browser workspace.
+Switching back and forth between a code reader and external image preview tools breaks concentration. lx8 provides first-class support for opening image files directly in editor tabs. With precise zoom controls (up to 3200%), transparency background toggles, and pixelation options, developers can inspect graphics, verify icon alignment, and audit visual changes without leaving their browser workspace.
 
 ---
 
 ## Supported Formats
 
-env0 natively renders and inspects standard web and raster image formats:
+lx8 natively renders and inspects standard web and raster image formats:
 
 - **Vector Graphics**: `.svg`
 - **Raster Formats**: `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`, `.avif`, `.ico`, `.bmp`
@@ -34,7 +34,7 @@ env0 natively renders and inspects standard web and raster image formats:
   - **Light Matte**: Solid `#ffffff` bright matte for checking dark icons.
 - **Rendering Modes (Smooth vs. Pixelated)**: Press `p` to toggle between bilinear smoothing (ideal for photographs and continuous diagrams) and nearest-neighbor pixelated rendering (essential for pixel art, favicons, and auditing SVG crispness). Small icons ($\le 64\times64$ px) automatically default to pixelated mode.
 - **Markdown Click-to-Expand Lightbox**: Clicking any inline image within a Markdown preview opens a centered, modal lightbox with a blurred backdrop, natural dimensions, a copy path button, and an option to promote the image into a dedicated editor tab.
-- **Broken Image Safeguard**: If an image link in Markdown is missing or broken, env0 gracefully replaces it with a clean warning card instead of leaving broken browser icons or causing layout shifts.
+- **Broken Image Safeguard**: If an image link in Markdown is missing or broken, lx8 gracefully replaces it with a clean warning card instead of leaving broken browser icons or causing layout shifts.
 
 ---
 
@@ -42,7 +42,7 @@ env0 natively renders and inspects standard web and raster image formats:
 
 ### Auditing Vector & Icon Assets
 When adding SVG icons or favicons to a project:
-1. Open the `.svg` or `.ico` file in env0.
+1. Open the `.svg` or `.ico` file in lx8.
 2. Press `+` to zoom up to 800% or 1600%.
 3. Press `b` to cycle through the checkerboard, dark, and light backgrounds to verify icon stroke contrast and transparent cutouts.
 4. Press `p` to inspect vector edges with nearest-neighbor sharpness.

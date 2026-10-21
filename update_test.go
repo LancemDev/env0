@@ -43,14 +43,14 @@ func TestCompareSemver(t *testing.T) {
 func TestFetchLatestRelease(t *testing.T) {
 	fakeRelease := githubRelease{
 		TagName: "v0.2.0",
-		Name:    "env0 v0.2.0",
+		Name:    "lx8 v0.2.0",
 		Assets: []struct {
 			Name               string `json:"name"`
 			BrowserDownloadURL string `json:"browser_download_url"`
 		}{
 			{
-				Name:               "env0-0.2.0-linux-amd64",
-				BrowserDownloadURL: "https://example.com/download/env0",
+				Name:               "lx8-0.2.0-linux-amd64",
+				BrowserDownloadURL: "https://example.com/download/lx8",
 			},
 		},
 	}
@@ -61,7 +61,7 @@ func TestFetchLatestRelease(t *testing.T) {
 	}))
 	defer server.Close()
 
-	t.Setenv("ENV0_UPDATE_URL", server.URL)
+	t.Setenv("LX8_UPDATE_URL", server.URL)
 
 	rel, err := fetchLatestRelease("test/repo")
 	if err != nil {
@@ -71,7 +71,7 @@ func TestFetchLatestRelease(t *testing.T) {
 	if rel.TagName != "v0.2.0" {
 		t.Errorf("got TagName %q, want v0.2.0", rel.TagName)
 	}
-	if len(rel.Assets) != 1 || rel.Assets[0].Name != "env0-0.2.0-linux-amd64" {
+	if len(rel.Assets) != 1 || rel.Assets[0].Name != "lx8-0.2.0-linux-amd64" {
 		t.Errorf("unexpected assets: %+v", rel.Assets)
 	}
 }
@@ -80,7 +80,7 @@ func TestUpdateStatePersistence(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("XDG_STATE_HOME", tmpDir)
 
-	statePath := filepath.Join(tmpDir, "env0", "update_check.json")
+	statePath := filepath.Join(tmpDir, "lx8", "update_check.json")
 	if _, err := os.Stat(statePath); !os.IsNotExist(err) {
 		t.Fatalf("expected state file to not exist yet")
 	}
@@ -106,7 +106,7 @@ func TestUpdateStatePersistence(t *testing.T) {
 }
 
 func TestDownloadVerifiedAsset(t *testing.T) {
-	assetName := "env0-0.2.0-linux-amd64"
+	assetName := "lx8-0.2.0-linux-amd64"
 	binary := []byte("test binary")
 	digest := fmt.Sprintf("%x", sha256.Sum256(binary))
 
@@ -133,7 +133,7 @@ func TestDownloadVerifiedAsset(t *testing.T) {
 }
 
 func TestDownloadVerifiedAssetRejectsMismatch(t *testing.T) {
-	assetName := "env0-0.2.0-linux-amd64"
+	assetName := "lx8-0.2.0-linux-amd64"
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/checksums.txt" {
 			_, _ = fmt.Fprintf(w, "%064x  %s\n", 0, assetName)
@@ -150,7 +150,7 @@ func TestDownloadVerifiedAssetRejectsMismatch(t *testing.T) {
 }
 
 func TestChecksumForRejectsMissingAndMalformedEntries(t *testing.T) {
-	assetName := "env0-0.2.0-linux-amd64"
+	assetName := "lx8-0.2.0-linux-amd64"
 	for name, checksums := range map[string]string{
 		"missing":   fmt.Sprintf("%064x  other-asset\n", 0),
 		"malformed": "not-a-sha256  " + assetName + "\n",

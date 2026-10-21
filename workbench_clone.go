@@ -11,7 +11,7 @@ package main
 //  3. a bounded scan of the usual places people keep code (~/workspace,
 //     ~/code, ~/src, ...) and the folders around recorded directories.
 //
-// When none is found the page asks: point at a clone, or let env0 make one,
+// When none is found the page asks: point at a clone, or let lx8 make one,
 // once, under the state directory (repos/<owner>/<repo>), to be reused by
 // every later PR of that repository.
 
@@ -52,7 +52,7 @@ func splitRepo(repo string) (owner, name string) {
 	return owner, name
 }
 
-// managedCloneDir is where env0 makes a clone when the user asks it to.
+// managedCloneDir is where lx8 makes a clone when the user asks it to.
 func managedCloneDir(repo string) string {
 	owner, name := splitRepo(repo)
 	return filepath.Join(workbenchStateDir(), "repos", owner, name)
@@ -189,7 +189,7 @@ func (wb *workbench) rememberClone(repo, dir string) {
 var errNoClone = errors.New("no local clone")
 
 // prClone returns the clone a PR's child should start in. The remembered
-// clone wins; a remembered env0-made clone that is missing is made again.
+// clone wins; a remembered lx8-made clone that is missing is made again.
 func (wb *workbench) prClone(c *wbChild, it wbItem) (string, error) {
 	f := wb.store.Load()
 	remembered := f.Clones[repoKey(it.Repo)]

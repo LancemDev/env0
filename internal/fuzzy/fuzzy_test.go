@@ -20,7 +20,7 @@ func TestFuzzyRanking(t *testing.T) {
 
 	paths := []string{
 		"internal/server/http_server.go",
-		"cmd/env0/main.go",
+		"cmd/lx8/main.go",
 		"web/app.js",
 		"pkg/util/strings.go",
 		"vendor/github.com/x/http/server.go",

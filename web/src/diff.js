@@ -23,11 +23,11 @@ let shown = null; // doc the diff view is currently showing, null while hidden
 // picked (split vs unified) is remembered globally as the default for the
 // next file entering diff view.
 export function setLayoutPref(mode) {
-  try { localStorage.setItem('env0.diffLayout', mode); } catch {}
+  try { localStorage.setItem('lx8.diffLayout', mode); } catch {}
 }
 
 export function layoutPref() {
-  try { return localStorage.getItem('env0.diffLayout') || 'split'; } catch { return 'split'; }
+  try { return localStorage.getItem('lx8.diffLayout') || 'split'; } catch { return 'split'; }
 }
 
 function diffMode(d = doc_()) {

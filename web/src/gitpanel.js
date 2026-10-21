@@ -87,7 +87,7 @@ function updateGitPanelVisibility() {
   p.hidden = !S.meta?.git;
   const nudge = $('#git-token-nudge');
   if (nudge) {
-    // Only for a remote on a forge env0 knows. The PR bar already carries its
+    // Only for a remote on a forge lx8 knows. The PR bar already carries its
     // own "no token" note, so skip this one in PR review mode to avoid
     // nudging twice.
     const forge = S.meta?.forge;
@@ -965,7 +965,7 @@ function showMoreCommitFiles(el) {
 }
 
 function openCommitPath(el, path) {
-  // env0 has no diff for a binary file, so say so rather than doing nothing.
+  // lx8 has no diff for a binary file, so say so rather than doing nothing.
   if (cachedCommitFiles(el.dataset.sha)?.find(f => f.path === path)?.binary) {
     showGitError('Binary file, no diff to show');
     return;

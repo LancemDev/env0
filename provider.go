@@ -20,7 +20,7 @@ type PRTarget struct {
 	URL      string // original URL
 }
 
-// PRMeta holds the normalized metadata env0 needs to check out a PR,
+// PRMeta holds the normalized metadata lx8 needs to check out a PR,
 // compute diffs, and label the review UI.
 type PRMeta struct {
 	Number           int
@@ -152,20 +152,20 @@ func (a gitAuth) redact(s string) string { return redactToken(s, a.Token) }
 type ForgeInfo struct {
 	Name          string `json:"name"`          // provider name, e.g. "gitlab"
 	Label         string `json:"label"`         // display name, e.g. "GitLab"
-	TokenKey      string `json:"tokenKey"`      // the env0 setting holding its token
+	TokenKey      string `json:"tokenKey"`      // the lx8 setting holding its token
 	TokenCategory string `json:"tokenCategory"` // that setting's Settings category
 	TokenHint     string `json:"tokenHint"`     // where else a token is picked up from
 }
 
 // TokenSetup walks someone through getting a token for one forge host: the
-// page that creates it, what to pick there, and the settings env0 stores it
+// page that creates it, what to pick there, and the settings lx8 stores it
 // under. It drives the Connect dialog, so it must name exactly what the
 // forge's own page calls things.
 type TokenSetup struct {
 	URL      string      `json:"url"`                // the forge page that creates a token
 	Steps    []string    `json:"steps"`              // what to choose on that page, in order
-	CLI      string      `json:"cli,omitempty"`      // a CLI login env0 also reads, e.g. "gh auth login"
-	Env      string      `json:"env"`                // the environment variable env0 also reads
+	CLI      string      `json:"cli,omitempty"`      // a CLI login lx8 also reads, e.g. "gh auth login"
+	Env      string      `json:"env"`                // the environment variable lx8 also reads
 	HostKey  string      `json:"hostKey,omitempty"`  // setting naming the host the token belongs to, for forges that have many
 	Extra    *TokenField `json:"extra,omitempty"`    // a second value some tokens need (Bitbucket's account email)
 	Readonly string      `json:"readonly,omitempty"` // what works without any token
@@ -337,5 +337,5 @@ func ParsePRURL(rawURL string) (GitProvider, PRTarget, error) {
 	return nil, PRTarget{}, fmt.Errorf("unsupported or unrecognized PR URL: %q (expected e.g. %s)", rawURL, prURLExamples)
 }
 
-// prURLExamples is the URL shapes env0 opens, for error messages.
+// prURLExamples is the URL shapes lx8 opens, for error messages.
 const prURLExamples = "https://github.com/owner/repo/pull/123, https://gitlab.com/group/project/-/merge_requests/45, https://codeberg.org/owner/repo/pulls/7, or https://bitbucket.org/workspace/repo/pull-requests/9"

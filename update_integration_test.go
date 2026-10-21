@@ -24,23 +24,23 @@ func TestRunSelfUpdateMock(t *testing.T) {
 		ext = ".exe"
 	}
 
-	newBinPath := filepath.Join(tmpDir, "new-env0"+ext)
+	newBinPath := filepath.Join(tmpDir, "new-lx8"+ext)
 	// Write a shell script / batch script or copy existing current test binary
-	script := "#!/bin/sh\necho 'env0 0.2.0 (" + runtime.GOOS + "/" + runtime.GOARCH + ")'\n"
+	script := "#!/bin/sh\necho 'lx8 0.2.0 (" + runtime.GOOS + "/" + runtime.GOARCH + ")'\n"
 	if err := os.WriteFile(newBinPath, []byte(script), 0o755); err != nil {
 		t.Fatalf("failed to write fake binary: %v", err)
 	}
 
-	assetName := fmt.Sprintf("env0-0.2.0-%s-%s%s", runtime.GOOS, runtime.GOARCH, ext)
+	assetName := fmt.Sprintf("lx8-0.2.0-%s-%s%s", runtime.GOOS, runtime.GOARCH, ext)
 
 	// Setup mock server
 	var serverURL string
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/repos/test/env0/releases/latest":
+		case "/repos/test/lx8/releases/latest":
 			rel := githubRelease{
 				TagName: "v0.2.0",
-				Name:    "env0 v0.2.0",
+				Name:    "lx8 v0.2.0",
 				Assets: []struct {
 					Name               string `json:"name"`
 					BrowserDownloadURL string `json:"browser_download_url"`
@@ -62,11 +62,11 @@ func TestRunSelfUpdateMock(t *testing.T) {
 	defer ts.Close()
 	serverURL = ts.URL
 
-	t.Setenv("ENV0_REPO", "test/env0")
-	t.Setenv("ENV0_UPDATE_URL", ts.URL+"/repos/test/env0/releases/latest")
+	t.Setenv("LX8_REPO", "test/lx8")
+	t.Setenv("LX8_UPDATE_URL", ts.URL+"/repos/test/lx8/releases/latest")
 	t.Setenv("XDG_STATE_HOME", tmpDir)
 
-	rel, err := fetchLatestRelease("test/env0")
+	rel, err := fetchLatestRelease("test/lx8")
 	if err != nil {
 		t.Fatalf("fetchLatestRelease returned error: %v", err)
 	}
@@ -87,13 +87,13 @@ func TestInstallUpdate(t *testing.T) {
 	}
 
 	tmpDir := t.TempDir()
-	execPath := filepath.Join(tmpDir, "env0")
-	if err := os.WriteFile(execPath, []byte("#!/bin/sh\necho 'env0 0.1.0'\n"), 0o755); err != nil {
+	execPath := filepath.Join(tmpDir, "lx8")
+	if err := os.WriteFile(execPath, []byte("#!/bin/sh\necho 'lx8 0.1.0'\n"), 0o755); err != nil {
 		t.Fatalf("failed to seed current binary: %v", err)
 	}
 
-	assetName := fmt.Sprintf("env0-0.2.0-%s-%s", runtime.GOOS, runtime.GOARCH)
-	newBinary := []byte("#!/bin/sh\necho 'env0 0.2.0'\n")
+	assetName := fmt.Sprintf("lx8-0.2.0-%s-%s", runtime.GOOS, runtime.GOARCH)
+	newBinary := []byte("#!/bin/sh\necho 'lx8 0.2.0'\n")
 	digest := fmt.Sprintf("%x", sha256.Sum256(newBinary))
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -146,7 +146,7 @@ func TestInstallUpdate(t *testing.T) {
 func TestAutoUpdateFastPathSkipsNetwork(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("XDG_STATE_HOME", tmpDir)
-	t.Setenv("ENV0_UPDATE_URL", "http://127.0.0.1:1/should-not-be-hit")
+	t.Setenv("LX8_UPDATE_URL", "http://127.0.0.1:1/should-not-be-hit")
 
 	writeUpdateState(&updateState{LastChecked: time.Now(), LatestVer: "0.1.0"})
 
@@ -168,7 +168,7 @@ func TestAutoUpdateDueCheckSkipsInstallWhenUpToDate(t *testing.T) {
 		_ = json.NewEncoder(w).Encode(rel)
 	}))
 	defer ts.Close()
-	t.Setenv("ENV0_UPDATE_URL", ts.URL)
+	t.Setenv("LX8_UPDATE_URL", ts.URL)
 
 	autoUpdate("0.1.0")
 
@@ -217,7 +217,7 @@ func TestAutoUpdateVerbosePrintsUpToDate(t *testing.T) {
 		_ = json.NewEncoder(w).Encode(rel)
 	}))
 	defer ts.Close()
-	t.Setenv("ENV0_UPDATE_URL", ts.URL)
+	t.Setenv("LX8_UPDATE_URL", ts.URL)
 
 	out := captureAutoUpdateStdout(t, func() { autoUpdate("0.1.0") })
 	if !strings.Contains(out, "up to date") {
@@ -233,7 +233,7 @@ func TestAutoUpdateVerbosePrintsUpToDateFromCache(t *testing.T) {
 
 	tmpDir := t.TempDir()
 	t.Setenv("XDG_STATE_HOME", tmpDir)
-	t.Setenv("ENV0_UPDATE_URL", "http://127.0.0.1:1/should-not-be-hit")
+	t.Setenv("LX8_UPDATE_URL", "http://127.0.0.1:1/should-not-be-hit")
 
 	writeUpdateState(&updateState{LastChecked: time.Now(), LatestVer: "0.1.0"})
 
@@ -259,7 +259,7 @@ func TestAutoUpdateQuietWhenNotVerbose(t *testing.T) {
 		_ = json.NewEncoder(w).Encode(rel)
 	}))
 	defer ts.Close()
-	t.Setenv("ENV0_UPDATE_URL", ts.URL)
+	t.Setenv("LX8_UPDATE_URL", ts.URL)
 
 	out := captureAutoUpdateStdout(t, func() { autoUpdate("0.1.0") })
 	if out != "" {

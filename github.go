@@ -62,7 +62,7 @@ func (g *GitHubProvider) TokenSetup(host string) TokenSetup {
 	return TokenSetup{
 		URL: "https://github.com/settings/personal-access-tokens/new",
 		Steps: []string{
-			"Name the token (e.g. env0) and pick an expiration.",
+			"Name the token (e.g. lx8) and pick an expiration.",
 			"Under Repository access, choose the repositories you review (or All repositories).",
 			"Under Repository permissions, set Contents and Pull requests to Read and write.",
 			"Generate the token and copy it.",
@@ -125,7 +125,7 @@ func (g *GitHubProvider) Merge(ctx context.Context, target PRTarget, token strin
 	return mergePR(ctx, target.Owner, target.Repo, target.Number, token, req)
 }
 
-// resolveGitHubToken looks for a token in order: the explicit env0 setting
+// resolveGitHubToken looks for a token in order: the explicit lx8 setting
 // (github.token), the GITHUB_TOKEN environment variable, GH_TOKEN, then the gh CLI
 // if installed and logged in. An empty return means PR review stays read-only.
 func resolveGitHubToken(cfg settings) (token, source string) {
@@ -275,7 +275,7 @@ type prComment struct {
 
 // submitReview posts one review carrying every draft comment plus an overall
 // verdict in a single call, mirroring GitHub's own draft-then-submit model
-// so env0 never needs a per-comment endpoint.
+// so lx8 never needs a per-comment endpoint.
 func submitReview(ctx context.Context, owner, repo string, num int, token, commitID string, comments []prComment, event, body string) error {
 	type reviewComment struct {
 		Path string `json:"path"`

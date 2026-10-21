@@ -9,9 +9,9 @@ import { render } from './renderer.js';
 import { syncDiffAgentTargets } from './diff.js';
 import { emit } from './bus.js';
 
-/* env0 does not author edits. Each box composes an instruction and the range it
+/* lx8 does not author edits. Each box composes an instruction and the range it
    is anchored to, hands both to a coding harness on this machine, and reloads
-   whatever moved once that harness exits. Because env0 dispatched the run it
+   whatever moved once that harness exits. Because lx8 dispatched the run it
    knows when the work ended, so nothing here watches the filesystem.
 
    Several edits can run at once, one box per range: two harnesses rewriting
@@ -627,10 +627,10 @@ async function showPicker(session) {
 
   const ready = list.filter(h => h.installed);
   if (!ready.length) {
-    showToast('!', 'Could not find any coding harness like Claude Code, OpenCode, Codex, Antigravity, Aider, etc. Install one and restart env0.', 6000);
+    showToast('!', 'Could not find any coding harness like Claude Code, OpenCode, Codex, Antigravity, Aider, etc. Install one and restart lx8.', 6000);
     session.pickEl.innerHTML = '<div class="hint" style="line-height: 1.5; padding: 4px 2px;">' +
       'Could not find any coding harness like <b>Claude Code</b>, <b>OpenCode</b>, <b>Codex</b>, <b>Antigravity</b> (<code>agy</code>), <b>Aider</b>, <b>Goose</b>, <b>Gemini CLI</b>, or <b>Cursor Agent</b>.<br><br>' +
-      'Please install a coding harness, make sure it is on your <code>PATH</code>, and restart env0 after that.</div>';
+      'Please install a coding harness, make sure it is on your <code>PATH</code>, and restart lx8 after that.</div>';
     return;
   }
 
@@ -1020,7 +1020,7 @@ async function finish(session, j) {
   syncBoxVisibility();
   syncAgentTargets();
 
-  /* Without git env0 cannot tell what the harness touched, so an empty list
+  /* Without git lx8 cannot tell what the harness touched, so an empty list
      means "unknown" rather than "nothing" and everything is reloaded. */
   const changed = j.changed || [];
   if (!changed.length && j.tracked !== false) {

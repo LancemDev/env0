@@ -8,7 +8,7 @@ Workspace search provides full-repository text searching across all files in you
 
 When investigating an unfamiliar codebase, tracing error strings, auditing security vulnerabilities, or auditing how a configuration flag is utilized across services, searching file names alone is insufficient. Developers need to search through the entire workspace content at blazing speed.
 
-Traditional IDEs often struggle with whole-workspace text scans, stalling the UI or spinning up CPU fans as they churn through gigabytes of code. env0 provides multi-threaded parallel grep capability that queries tens of thousands of files in tens of milliseconds without causing browser stutters or high memory consumption. Results are cleanly grouped by file in the right-hand Inspector pane, providing line numbers, occurrence counts, and contextual snippets.
+Traditional IDEs often struggle with whole-workspace text scans, stalling the UI or spinning up CPU fans as they churn through gigabytes of code. lx8 provides multi-threaded parallel grep capability that queries tens of thousands of files in tens of milliseconds without causing browser stutters or high memory consumption. Results are cleanly grouped by file in the right-hand Inspector pane, providing line numbers, occurrence counts, and contextual snippets.
 
 ---
 

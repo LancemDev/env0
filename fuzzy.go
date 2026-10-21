@@ -1,7 +1,7 @@
 package main
 
 import (
-	"env0/internal/fuzzy"
+	"lx8/internal/fuzzy"
 	"runtime"
 	"sort"
 	"strings"

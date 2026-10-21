@@ -11,7 +11,7 @@ Both are `POST` with a JSON body and are resolved through `safePath`, so paths o
 | `/api/file/save` | `{path, content}` | Creates missing parent directories, refuses a directory target, writes the file (`0644`). Then `Evict` drops the highlight cache entry, the LSP document is closed and open documents refreshed, the git watcher is triggered, and the index rebuilds in the background. Returns `{ok, path, size}`. |
 | `/api/fs/new` | `{path, type}` | `type` is `file` or `dir`. Returns `409` if the path exists. Creates parents, writes an empty file or the directory, triggers the git watcher, rebuilds the index. Returns `{ok, path, type}`. |
 
-Handlers are `handleFileSave` and `handleFSNew` in [`server.go`](../../server.go); tests are in [`env0_test.go`](../../env0_test.go) (save, creation, conflict, traversal).
+Handlers are `handleFileSave` and `handleFSNew` in [`server.go`](../../server.go); tests are in [`lx8_test.go`](../../lx8_test.go) (save, creation, conflict, traversal).
 
 ## 2. Frontend
 

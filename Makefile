@@ -15,14 +15,14 @@ endif
 # Clean leading 'v' from version string if present
 CLEAN_VERSION := $(patsubst v%,%,$(TARGET_VERSION))
 
-# env0 collects no telemetry, so there is no key to inject here.
+# lx8 collects no telemetry, so there is no key to inject here.
 LDFLAGS := -s -w
 
 all: build
 
 help:
-	@echo "env0 make targets:"
-	@echo "  make build             - build env0 binary for current platform"
+	@echo "lx8 make targets:"
+	@echo "  make build             - build lx8 binary for current platform"
 	@echo "  make web               - bundle web assets (JS/CSS/themes)"
 	@echo "  make test              - run go test suite"
 	@echo "  make test-short        - run fast unit tests (short mode)"
@@ -36,9 +36,9 @@ web:
 	@node ./scripts/build-web.js
 
 build: web
-	@echo "Building env0 for local system..."
-	go build -trimpath -ldflags="$(LDFLAGS)" -o env0 .
-	@echo "Built ./env0 ($$(du -h env0 | cut -f1))"
+	@echo "Building lx8 for local system..."
+	go build -trimpath -ldflags="$(LDFLAGS)" -o lx8 .
+	@echo "Built ./lx8 ($$(du -h lx8 | cut -f1))"
 
 test: web
 	go test -v .
@@ -78,6 +78,6 @@ publish:
 	@echo "  git push origin master --tags"
 
 clean:
-	rm -f env0 web/app.js web/workbench.js
+	rm -f lx8 web/app.js web/workbench.js
 	touch web/app.js web/workbench.js
 	rm -rf dist/

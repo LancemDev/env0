@@ -18,7 +18,7 @@ import (
 //
 // Where Gitea differs from GitHub:
 //   - Review comments carry no reply link. Comments on the same line form one
-//     conversation in Gitea's own UI, so env0 threads them the same way, and a
+//     conversation in Gitea's own UI, so lx8 threads them the same way, and a
 //     "reply" is a new comment on that line.
 //   - There is no detailed mergeability: the PR is mergeable or it isn't.
 //     Branch protection shows up as the merge being refused, with Gitea's
@@ -55,7 +55,7 @@ func (g *GiteaProvider) TokenSetup(host string) TokenSetup {
 	return TokenSetup{
 		URL: "https://" + host + "/user/settings/applications",
 		Steps: []string{
-			"Under Generate new token, name it (e.g. env0).",
+			"Under Generate new token, name it (e.g. lx8).",
 			"Under Select permissions, set repository and issue to Read and write.",
 			"Generate the token and copy it.",
 		},
@@ -102,7 +102,7 @@ func (g *GiteaProvider) PRHeadRef(t PRTarget) string {
 
 // Gitea reads the password as the token; the username is not checked.
 func (g *GiteaProvider) GitAuth(t PRTarget, token string) gitAuth {
-	return basicGitAuth(t.Host, "env0", token)
+	return basicGitAuth(t.Host, "lx8", token)
 }
 
 // giteaTokenHost is the one host the gitea.token setting and GITEA_TOKEN are
@@ -248,7 +248,7 @@ func (g *GiteaProvider) CheckPushAccess(ctx context.Context, t PRTarget, token s
 	return err == nil && r.Permissions.Push
 }
 
-// giteaEvents maps env0's review verdicts onto Gitea's review states.
+// giteaEvents maps lx8's review verdicts onto Gitea's review states.
 var giteaEvents = map[string]string{"APPROVE": "APPROVED", "REQUEST_CHANGES": "REQUEST_CHANGES", "COMMENT": "COMMENT"}
 
 // SubmitReview posts one review with every draft, like GitHub. Gitea

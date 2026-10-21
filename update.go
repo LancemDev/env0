@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	defaultRepo       = "LancemDev/env0"
+	defaultRepo       = "LancemDev/lx8"
 	updateCheckPeriod = 24 * time.Hour
 )
 
@@ -40,22 +40,22 @@ type updateState struct {
 }
 
 func getRepoName() string {
-	if r := os.Getenv("ENV0_REPO"); r != "" {
+	if r := os.Getenv("LX8_REPO"); r != "" {
 		return r
 	}
 	return defaultRepo
 }
 
 func stateFilePath() string {
-	// Respect XDG_STATE_HOME or fallback to ~/.local/state/env0 or ~/.env0
+	// Respect XDG_STATE_HOME or fallback to ~/.local/state/lx8 or ~/.lx8
 	if xdg := os.Getenv("XDG_STATE_HOME"); xdg != "" {
-		return filepath.Join(xdg, "env0", "update_check.json")
+		return filepath.Join(xdg, "lx8", "update_check.json")
 	}
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return filepath.Join(os.TempDir(), "env0_update_check.json")
+		return filepath.Join(os.TempDir(), "lx8_update_check.json")
 	}
-	return filepath.Join(home, ".env0", "update_check.json")
+	return filepath.Join(home, ".lx8", "update_check.json")
 }
 
 func readUpdateState() (*updateState, error) {
@@ -123,7 +123,7 @@ func compareSemver(v1, v2 string) int {
 
 // fetchLatestRelease queries the GitHub API or release redirect for the latest version.
 func fetchLatestRelease(repo string) (*githubRelease, error) {
-	apiURL := os.Getenv("ENV0_UPDATE_URL")
+	apiURL := os.Getenv("LX8_UPDATE_URL")
 	if apiURL == "" {
 		apiURL = fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", repo)
 	}
@@ -133,7 +133,7 @@ func fetchLatestRelease(repo string) (*githubRelease, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "env0-updater")
+	req.Header.Set("User-Agent", "lx8-updater")
 	req.Header.Set("Accept", "application/vnd.github.v3+json")
 
 	resp, err := client.Do(req)
@@ -226,12 +226,12 @@ func downloadVerifiedAsset(client *http.Client, assetURL, checksumURL, assetName
 }
 
 // autoUpdate runs in a background goroutine after the server has already
-// started listening, so env0 never makes a network call before serving. It
+// started listening, so lx8 never makes a network call before serving. It
 // reuses the cached daily-check state so it only hits the network once
 // every updateCheckPeriod; on the days it does check, a newer release is
 // installed in place and a notice is printed on the CLI instructing the user
-// to restart env0. Any failure (network, permissions, verification) is non-fatal:
-// env0 continues running on the current binary.
+// to restart lx8. Any failure (network, permissions, verification) is non-fatal:
+// lx8 continues running on the current binary.
 func autoUpdate(currentVersion string) {
 	if uiQuiet {
 		return
@@ -259,7 +259,7 @@ func autoUpdate(currentVersion string) {
 
 	if latestVer == "" || compareSemver(latestVer, currentVersion) <= 0 {
 		if uiVerbose {
-			uiStatus("ok", fmt.Sprintf("env0 is up to date (v%s)", currentVersion), "", 0, os.Stdout)
+			uiStatus("ok", fmt.Sprintf("lx8 is up to date (v%s)", currentVersion), "", 0, os.Stdout)
 		}
 		return
 	}
@@ -275,7 +275,7 @@ func autoUpdate(currentVersion string) {
 		latestVer = strings.TrimPrefix(rel.TagName, "v")
 		if compareSemver(latestVer, currentVersion) <= 0 {
 			if uiVerbose {
-				uiStatus("ok", fmt.Sprintf("env0 is up to date (v%s)", currentVersion), "", 0, os.Stdout)
+				uiStatus("ok", fmt.Sprintf("lx8 is up to date (v%s)", currentVersion), "", 0, os.Stdout)
 			}
 			return
 		}
@@ -290,7 +290,7 @@ func autoUpdate(currentVersion string) {
 		return
 	}
 
-	uiStatus("step", fmt.Sprintf("updating env0 v%s -> v%s...", currentVersion, latestVer), "pass -no-update to skip", 0, os.Stdout)
+	uiStatus("step", fmt.Sprintf("updating lx8 v%s -> v%s...", currentVersion, latestVer), "pass -no-update to skip", 0, os.Stdout)
 
 	if err := installUpdate(rel, latestVer, execPath); err != nil {
 		uiStatus("warn", fmt.Sprintf("auto-update failed: %v", err), "continuing with current version", 0, os.Stderr)
@@ -299,10 +299,10 @@ func autoUpdate(currentVersion string) {
 
 	writeUpdateState(&updateState{LastChecked: time.Now(), LatestVer: latestVer})
 
-	uiStatus("ok", fmt.Sprintf("env0 has been updated to v%s", latestVer), "restart env0 to see the latest changes", 0, os.Stdout)
+	uiStatus("ok", fmt.Sprintf("lx8 has been updated to v%s", latestVer), "restart lx8 to see the latest changes", 0, os.Stdout)
 }
 
-// runSelfUpdate implements env0 --update.
+// runSelfUpdate implements lx8 --update.
 func runSelfUpdate(currentVer string) error {
 	repo := getRepoName()
 	uiStatus("step", fmt.Sprintf("checking for updates from %s...", repo), "", 0, os.Stdout)
@@ -314,7 +314,7 @@ func runSelfUpdate(currentVer string) error {
 
 	latestVer := strings.TrimPrefix(rel.TagName, "v")
 	if compareSemver(latestVer, currentVer) <= 0 {
-		uiStatus("ok", fmt.Sprintf("env0 is already up to date (v%s)", currentVer), "", 0, os.Stdout)
+		uiStatus("ok", fmt.Sprintf("lx8 is already up to date (v%s)", currentVer), "", 0, os.Stdout)
 		return nil
 	}
 
@@ -339,7 +339,7 @@ func runSelfUpdate(currentVer string) error {
 		LatestVer:   latestVer,
 	})
 
-	uiStatus("ok", fmt.Sprintf("env0 successfully updated to v%s at %s", latestVer, execPath), "", 0, os.Stdout)
+	uiStatus("ok", fmt.Sprintf("lx8 successfully updated to v%s at %s", latestVer, execPath), "", 0, os.Stdout)
 	return nil
 }
 
@@ -351,7 +351,7 @@ func installUpdate(rel *githubRelease, latestVer, execPath string) error {
 	if runtime.GOOS == "windows" {
 		ext = ".exe"
 	}
-	expectedAsset := fmt.Sprintf("env0-%s-%s-%s%s", latestVer, runtime.GOOS, runtime.GOARCH, ext)
+	expectedAsset := fmt.Sprintf("lx8-%s-%s-%s%s", latestVer, runtime.GOOS, runtime.GOARCH, ext)
 
 	var downloadURL, checksumURL string
 	for _, asset := range rel.Assets {
@@ -374,14 +374,14 @@ func installUpdate(rel *githubRelease, latestVer, execPath string) error {
 
 	// Download to temporary file in the same directory as the executable (for atomic rename)
 	dir := filepath.Dir(execPath)
-	tmpFile, err := os.CreateTemp(dir, "env0-update-*")
+	tmpFile, err := os.CreateTemp(dir, "lx8-update-*")
 	if err != nil {
 		// If directory is not writable, warn user about permissions
 		if os.IsPermission(err) {
-			return fmt.Errorf("permission denied writing to %s. Try running with 'sudo env0 --update'", dir)
+			return fmt.Errorf("permission denied writing to %s. Try running with 'sudo lx8 --update'", dir)
 		}
 		// Try temp directory as fallback
-		tmpFile, err = os.CreateTemp("", "env0-update-*")
+		tmpFile, err = os.CreateTemp("", "lx8-update-*")
 		if err != nil {
 			return fmt.Errorf("could not create temporary file: %w", err)
 		}
@@ -428,7 +428,7 @@ func installUpdate(rel *githubRelease, latestVer, execPath string) error {
 			// If cross-device link error, copy instead
 			if err := copyOrMove(tmpPath, execPath); err != nil {
 				if os.IsPermission(err) {
-					return fmt.Errorf("permission denied replacing %s. Try running with 'sudo env0 --update'", execPath)
+					return fmt.Errorf("permission denied replacing %s. Try running with 'sudo lx8 --update'", execPath)
 				}
 				return fmt.Errorf("failed to replace binary %s: %w", execPath, err)
 			}
@@ -447,7 +447,7 @@ func copyOrMove(src, dst string) error {
 
 	// Write to temporary file in target directory first
 	dir := filepath.Dir(dst)
-	tmp, err := os.CreateTemp(dir, "env0-replace-*")
+	tmp, err := os.CreateTemp(dir, "lx8-replace-*")
 	if err != nil {
 		return err
 	}

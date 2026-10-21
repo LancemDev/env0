@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build-and-release:
-    name: Build & Release env0
+    name: Build & Release lx8
     runs-on: ubuntu-latest
 
     steps:
@@ -71,7 +71,7 @@ jobs:
             arch=${t#*/}
             ext=""
             [ "$os" = "windows" ] && ext=".exe"
-            name="env0-${VERSION}-${os}-${arch}${ext}"
+            name="lx8-${VERSION}-${os}-${arch}${ext}"
             printf "Building %-28s ... " "$name"
             CGO_ENABLED=0 GOOS="$os" GOARCH="$arch" \
               go build -trimpath -ldflags="$LDFLAGS" -o "dist/$name" .
@@ -81,7 +81,7 @@ jobs:
       - name: Generate Checksums
         run: |
           cd dist
-          sha256sum env0-* > checksums.txt
+          sha256sum lx8-* > checksums.txt
           cat checksums.txt
 
       - name: Create GitHub Release
@@ -93,5 +93,5 @@ jobs:
           prerelease: false
           generate_release_notes: true
           files: |
-            dist/env0-*
+            dist/lx8-*
             dist/checksums.txt

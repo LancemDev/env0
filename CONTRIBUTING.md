@@ -1,10 +1,10 @@
-# Contributing to env0
+# Contributing to lx8
 
-Thank you for your interest in improving env0.
+Thank you for your interest in improving lx8.
 
 ## AI-Driven Development and Contributions
 
-env0 is built and maintained entirely using AI coding agents.
+lx8 is built and maintained entirely using AI coding agents.
 
 Because all implementation, architecture refactoring, and code changes are written by AI agents guided by our core design principles (zero config, zero runtime dependencies, lean memory footprint, single binary, reads-first focus with edits delegated to coding agents), we generally do not accept unsolicited pull requests containing manual or disparate code patches.
 
@@ -15,7 +15,7 @@ Instead, the most valuable contribution you can provide is a clear, detailed bug
 
 If you encounter unexpected behavior, memory leaks, navigation bugs, or performance issues:
 
-- Check existing [GitHub Issues](https://github.com/LancemDev/env0/issues) first to avoid duplicates.
+- Check existing [GitHub Issues](https://github.com/LancemDev/lx8/issues) first to avoid duplicates.
 - Open a new issue using our [Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.md).
 - Provide comprehensive context: operating system, browser, workspace size, steps to reproduce, expected vs. observed behavior, logs, and screenshots if applicable.
 
@@ -24,12 +24,12 @@ If you encounter unexpected behavior, memory leaks, navigation bugs, or performa
 Have an idea to make reading and navigating code faster or smoother?
 
 - Open a new issue using our [Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.md).
-- Explain the motivation: what problem does this solve, why would it benefit users, and how would it fit env0's reads-first, minimal-footprint philosophy?
+- Explain the motivation: what problem does this solve, why would it benefit users, and how would it fit lx8's reads-first, minimal-footprint philosophy?
 
 ## Review and Implementation Process
 
-1. Review: Maintainers evaluate every issue against env0's design philosophy (simplicity, single-binary distribution, minimal resource consumption, speed).
+1. Review: Maintainers evaluate every issue against lx8's design philosophy (simplicity, single-binary distribution, minimal resource consumption, speed).
 1. Assessment: We determine whether the proposal is apt, feasible, and aligned with the project roadmap.
-1. Execution: If approved, we formulate prompt specifications and task plans, and our AI agents implement, test, benchmark, document, and release the changes. Any major or user-facing feature addition must include a corresponding tip added to `tips.json` (served at `https://github.com/LancemDev/env0/tips.json`) and built-in offline default tips.
+1. Execution: If approved, we formulate prompt specifications and task plans, and our AI agents implement, test, benchmark, document, and release the changes. Any major or user-facing feature addition must include a corresponding tip added to `tips.json` (served at `https://github.com/LancemDev/lx8/tips.json`) and built-in offline default tips.
 
-Thank you for helping make env0 better.
+Thank you for helping make lx8 better.

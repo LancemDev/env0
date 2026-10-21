@@ -51,14 +51,14 @@ func cleanBasePath(p string) string {
 	return p
 }
 
-// Server is the main env0 HTTP server handling the web UI, static assets,
+// Server is the main lx8 HTTP server handling the web UI, static assets,
 // REST API endpoints, Server-Sent Events (SSE), and workspace services.
 type Server struct {
 	ix        *Index
 	lsp       *lspManager
 	agent     *agentManager     // nil unless main wires editing for this session
 	threads   *threadManager    // nil unless editing is wired: threads run on the same harness
-	pr        *prSession        // nil unless main launched this process as `env0 pr ...`
+	pr        *prSession        // nil unless main launched this process as `lx8 pr ...`
 	diffBase  string            // ref /api/diff and /api/gutter diff against; "HEAD" unless in PR mode
 	prHeadSHA string            // PR mode only: the checked-out PR head commit. Frozen boundary between
 	// the PR's own diff (diffBase..prHeadSHA) and the reviewer's local edits
@@ -68,7 +68,7 @@ type Server struct {
 	basePath   string
 	session    *sessionManager
 
-	workbenchURL string // the workbench's base path, when this env0 is one of its workspaces
+	workbenchURL string // the workbench's base path, when this lx8 is one of its workspaces
 
 	lastReq atomic.Int64 // unix nanos of the most recent request
 
@@ -216,7 +216,7 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc(s.routePath("/api/session"), s.handleSession)
 }
 
-// NewServer creates and initializes a env0 Server instance, binding index and language servers,
+// NewServer creates and initializes a lx8 Server instance, binding index and language servers,
 // starting the background GitWatcher, and registering all HTTP and SSE routes.
 func NewServer(ix *Index, lsp *lspManager, basePaths ...string) *Server {
 	if lsp == nil {
@@ -617,7 +617,7 @@ func (s *Server) SetPR(p *prSession) {
 		}
 		if p.target.Owner != "" && p.target.Repo != "" && p.target.Number > 0 {
 			// Drafts are keyed on the PR, not the base path. Carry over any
-			// drafts an older env0 saved under the base-path file.
+			// drafts an older lx8 saved under the base-path file.
 			prs := newPRSessionManager(p.target)
 			if old := s.session; old != nil && len(prs.Get().Drafts) == 0 && len(old.Get().Drafts) > 0 {
 				drafts := old.Get().Drafts
@@ -740,12 +740,12 @@ var (
 
 func vendorCacheDir() string {
 	if c := os.Getenv("XDG_CACHE_HOME"); c != "" {
-		return filepath.Join(c, "env0", "vendor")
+		return filepath.Join(c, "lx8", "vendor")
 	}
 	if home, err := os.UserHomeDir(); err == nil && home != "" {
-		return filepath.Join(home, ".env0", "cache", "vendor")
+		return filepath.Join(home, ".lx8", "cache", "vendor")
 	}
-	return filepath.Join(os.TempDir(), "env0-cache", "vendor")
+	return filepath.Join(os.TempDir(), "lx8-cache", "vendor")
 }
 
 type memGzFile struct {
@@ -1898,7 +1898,7 @@ type gitSyncState struct {
 	PR        int  `json:"pr,omitempty"`
 	Rewritten bool `json:"rewritten,omitempty"`
 
-	ontoRef string // the ref env0 fetched the PR's base into; the harness rebases onto it and never fetches
+	ontoRef string // the ref lx8 fetched the PR's base into; the harness rebases onto it and never fetches
 }
 
 // syncPRRefs copies the PR session's head and merge-base into the server and
@@ -1999,7 +1999,7 @@ func (s *Server) handleGitSyncState(w http.ResponseWriter, r *http.Request) {
 
 // handleGitSyncAgent dispatches the selected harness to rebase (or merge)
 // the current branch onto its upstream after a pull refused to
-// fast-forward. Only ever on an explicit click: env0 itself still never
+// fast-forward. Only ever on an explicit click: lx8 itself still never
 // rewrites history, and the harness is told never to push. When a rebase or
 // merge is already half-done (the last attempt stopped on a conflict), the
 // harness is asked to finish that one instead of starting over.
@@ -2136,7 +2136,7 @@ func (s *Server) handleUnpushed(w http.ResponseWriter, r *http.Request) {
 
 // handleCommitFiles returns the paths one commit touched, badged with git's
 // name-status letter. Unknown SHAs come back as an empty list, not an error:
-// the only way to ask for one is from a list env0 handed out, and a commit
+// the only way to ask for one is from a list lx8 handed out, and a commit
 // that has since been rewritten is a stale click, not a failure worth a toast.
 func (s *Server) handleCommitFiles(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {

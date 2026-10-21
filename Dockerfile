@@ -13,13 +13,13 @@ RUN go mod download
 COPY . .
 # Copy generated bundle into web/
 COPY --from=web-builder /build/web/app.js ./web/app.js
-RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /bin/env0 .
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /bin/lx8 .
 
 # Stage 3: Minimal runtime container
 FROM alpine:3.21
 RUN apk --no-cache add ca-certificates git
-COPY --from=go-builder /bin/env0 /usr/local/bin/env0
+COPY --from=go-builder /bin/lx8 /usr/local/bin/lx8
 
 EXPOSE 7777
-ENTRYPOINT ["env0", "-host", "0.0.0.0", "-no-open"]
+ENTRYPOINT ["lx8", "-host", "0.0.0.0", "-no-open"]
 CMD ["/workspace"]

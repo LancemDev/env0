@@ -1,6 +1,6 @@
 # Image Viewer & Asset Inspection Architecture
 
-This document describes env0's first-class image viewing architecture: how standalone image files are loaded and rendered as interactive tabs, how viewport transforms and background modes work, and how inline images in Markdown documents are enhanced with a click-to-expand lightbox and error fallbacks.
+This document describes lx8's first-class image viewing architecture: how standalone image files are loaded and rendered as interactive tabs, how viewport transforms and background modes work, and how inline images in Markdown documents are enhanced with a click-to-expand lightbox and error fallbacks.
 
 ---
 
@@ -8,7 +8,7 @@ This document describes env0's first-class image viewing architecture: how stand
 
 Modern software repositories increasingly contain visual assets: SVG icons, UI mockups, generated architectural diagrams, charts, favicon bundles, and asset pipelines. When pairing with coding agents that generate or modify images and documentation, developers need to inspect these visual outputs immediately without switching to an external tool or desktop previewer.
 
-env0 treats image formats (`.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.svg`, `.ico`, `.bmp`, `.avif`) as first-class documents alongside source code and Markdown.
+lx8 treats image formats (`.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.svg`, `.ico`, `.bmp`, `.avif`) as first-class documents alongside source code and Markdown.
 
 ```text
 Tree / Palette Click

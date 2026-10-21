@@ -508,7 +508,7 @@ export async function renderMermaidBlocks(root, current = () => true) {
       mermaidLastThemeKey = themeKey;
     }
 
-    const id = `env0-mermaid-${++mermaidRenderID}`;
+    const id = `lx8-mermaid-${++mermaidRenderID}`;
     output.className = 'md-mermaid';
     output.setAttribute('aria-busy', 'true');
     pre.hidden = false;

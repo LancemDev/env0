@@ -104,7 +104,7 @@ func computeDiffBase(worktree, srcRepo, srcRemote string, fg forgeGit, baseRef s
 		if fetchErr != "" {
 			diffBaseWarning = fmt.Sprintf("%s (%s)", diffBaseWarning, fetchErr)
 		}
-		fmt.Fprintln(os.Stderr, "env0: warning:", diffBaseWarning)
+		fmt.Fprintln(os.Stderr, "lx8: warning:", diffBaseWarning)
 		if onProgress != nil {
 			onProgress("Warning: " + diffBaseWarning)
 		}
@@ -139,7 +139,7 @@ func (p *prSession) git() forgeGit {
 
 // prBaseRef is where a session keeps its fetched copy of the PR's base
 // branch: the ref diffs are measured from and an agent rebase targets.
-func prBaseRef(num int) string { return fmt.Sprintf("refs/env0/base/%d", num) }
+func prBaseRef(num int) string { return fmt.Sprintf("refs/lx8/base/%d", num) }
 
 // fetchPRBase force-updates prBaseRef(num) from the PR's base branch,
 // returning git's error text ("" on success). Forced, so a base branch that
@@ -177,7 +177,7 @@ func checkoutPR(ctx context.Context, provider GitProvider, target PRTarget, cwd 
 		return nil, err
 	}
 
-	tmp, err := os.MkdirTemp("", "env0-pr-*")
+	tmp, err := os.MkdirTemp("", "lx8-pr-*")
 	if err != nil {
 		return nil, err
 	}
@@ -198,13 +198,13 @@ func checkoutPR(ctx context.Context, provider GitProvider, target PRTarget, cwd 
 		if onProgress != nil {
 			onProgress(fmt.Sprintf("Fetching PR #%d head and preparing worktree...", num))
 		}
-		headRefspec := fmt.Sprintf("%s:refs/env0/pr/%d", fg.HeadRef, num)
+		headRefspec := fmt.Sprintf("%s:refs/lx8/pr/%d", fg.HeadRef, num)
 		if out, err := gitLocalThenToken(fg.Auth, "-C", srcRepo, "fetch", "--no-tags", srcRemote, headRefspec); err != nil {
 			cleanup()
 			return nil, fmt.Errorf("git fetch PR head: %w: %s", err, fg.Auth.redact(strings.TrimSpace(string(out))))
 		}
 		// A partial clone (the workbench's own) fetches file contents here.
-		if out, err := gitLocalThenToken(fg.Auth, "-C", srcRepo, "worktree", "add", "--detach", tmp, fmt.Sprintf("refs/env0/pr/%d", num)); err != nil {
+		if out, err := gitLocalThenToken(fg.Auth, "-C", srcRepo, "worktree", "add", "--detach", tmp, fmt.Sprintf("refs/lx8/pr/%d", num)); err != nil {
 			cleanup()
 			return nil, fmt.Errorf("git worktree add: %w: %s", err, fg.Auth.redact(strings.TrimSpace(string(out))))
 		}
@@ -317,8 +317,8 @@ func (p *prSession) Close() {
 	}
 	if p.srcRepo != "" {
 		exec.Command("git", "-C", p.srcRepo, "worktree", "remove", "--force", p.worktree).Run()
-		exec.Command("git", "-C", p.srcRepo, "update-ref", "-d", fmt.Sprintf("refs/env0/pr/%d", p.meta.Number)).Run()
-		exec.Command("git", "-C", p.srcRepo, "update-ref", "-d", fmt.Sprintf("refs/env0/base/%d", p.meta.Number)).Run()
+		exec.Command("git", "-C", p.srcRepo, "update-ref", "-d", fmt.Sprintf("refs/lx8/pr/%d", p.meta.Number)).Run()
+		exec.Command("git", "-C", p.srcRepo, "update-ref", "-d", fmt.Sprintf("refs/lx8/base/%d", p.meta.Number)).Run()
 	}
 	os.RemoveAll(p.worktree)
 }
@@ -394,7 +394,7 @@ func (p *prSession) writeScopeFile(name, content string) string {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if p.scopeDir == "" {
-		dir, err := os.MkdirTemp("", "env0-prdiff-*")
+		dir, err := os.MkdirTemp("", "lx8-prdiff-*")
 		if err != nil {
 			return ""
 		}
@@ -442,7 +442,7 @@ func (p *prSession) Pull() (info string, err error) {
 	// the remote that clone can already authenticate to.
 	newRef := "FETCH_HEAD"
 	if srcRepo != "" && token == "" && fg.HeadRef != "" {
-		newRef = fmt.Sprintf("refs/env0/pr/%d", num)
+		newRef = fmt.Sprintf("refs/lx8/pr/%d", num)
 		headRefspec := fmt.Sprintf("+%s:%s", fg.HeadRef, newRef)
 		if out, err := exec.Command("git", "-C", srcRepo, "fetch", "--no-tags", srcRemote, headRefspec).CombinedOutput(); err != nil {
 			return "", fmt.Errorf("git fetch PR head: %w: %s", err, strings.TrimSpace(string(out)))
@@ -518,7 +518,7 @@ func (p *prSession) Pull() (info string, err error) {
 }
 
 // FetchBase refreshes the session's copy of the PR's base branch and
-// returns its ref -- what an agent rebase or merge of the base targets. env0
+// returns its ref -- what an agent rebase or merge of the base targets. lx8
 // fetches it itself, with the forge token, so the harness never needs
 // credentials (and never fetches at all).
 func (p *prSession) FetchBase() (string, error) {
@@ -1018,7 +1018,7 @@ func (s *Server) handlePRMerge(w http.ResponseWriter, r *http.Request) {
 // handlePRMergeMessage has the harness write (or rewrite) the commit message
 // a squash or merge commit lands with, from the PR's commits and diff, the
 // user's commit message instructions in Settings, and any one-off
-// instruction typed in the dialog. It only writes text: env0 shows it in the
+// instruction typed in the dialog. It only writes text: lx8 shows it in the
 // dialog, where it can still be edited before anything is merged.
 func (s *Server) handlePRMergeMessage(w http.ResponseWriter, r *http.Request) {
 	if !s.prOrFail(w) {
@@ -1073,9 +1073,9 @@ func (s *Server) handlePRMergeMessage(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, job)
 }
 
-// handleLaunchPR lets an already-running env0 open another PR without
+// handleLaunchPR lets an already-running lx8 open another PR without
 // disturbing its own session: it re-execs itself as a brand new process on
-// a new port with "env0 -y <url>". The call returns as soon as the child starts.
+// a new port with "lx8 -y <url>". The call returns as soon as the child starts.
 func (s *Server) handleLaunchPR(w http.ResponseWriter, r *http.Request) {
 	if !localPost(w, r) {
 		return

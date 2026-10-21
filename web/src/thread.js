@@ -601,7 +601,7 @@ function thrBack() {
 /* Starts a draft: anchored to info's range, or to the workspace when info is
    omitted. Nothing is created on the server until the first message is sent. */
 export function newThread(info) {
-  if (!thr.avail) { showToast('!', 'Threads need a coding harness: run env0 without -no-agent'); return; }
+  if (!thr.avail) { showToast('!', 'Threads need a coding harness: run lx8 without -no-agent'); return; }
   thr.opening = null;
   thrCloseStream();
   thr.cur = null;

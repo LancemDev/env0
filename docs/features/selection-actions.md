@@ -1,6 +1,6 @@
 # Selection Toolbar & Context Actions
 
-env0 features a dedicated footer selection toolbar and contextual right-click menu designed specifically for AI-assisted engineering and code review. When code is selected, env0 replaces standard footer clutter with purposeful actions: Copy Reference (`Alt+C`), Copy for Agent (`Alt+A`), Find Usages (`Alt+U`), Edit with Agent (`Alt+E`), and Start Thread (`Alt+T`, see [Threads](threads.md)).
+lx8 features a dedicated footer selection toolbar and contextual right-click menu designed specifically for AI-assisted engineering and code review. When code is selected, lx8 replaces standard footer clutter with purposeful actions: Copy Reference (`Alt+C`), Copy for Agent (`Alt+A`), Find Usages (`Alt+U`), Edit with Agent (`Alt+E`), and Start Thread (`Alt+T`, see [Threads](threads.md)).
 
 ---
 
@@ -8,7 +8,7 @@ env0 features a dedicated footer selection toolbar and contextual right-click me
 
 In typical developer workflows, sharing code snippets with teammates or pasting code into external AI chat interfaces (such as ChatGPT, Claude, or terminal coding agents) involves repetitive manual labor: selecting lines, copying them, manually writing down the file path and line numbers, and formatting markdown code fences.
 
-env0 turns code selection into a high-ergonomics launchpad. Instead of popping up obstructive floating tooltips that obscure adjacent lines of code, env0 smoothly transitions the left section of the fixed bottom status bar into an action bar the moment text is highlighted. The same actions are simultaneously accessible via a clean right-click context menu and direct keyboard shortcuts.
+lx8 turns code selection into a high-ergonomics launchpad. Instead of popping up obstructive floating tooltips that obscure adjacent lines of code, lx8 smoothly transitions the left section of the fixed bottom status bar into an action bar the moment text is highlighted. The same actions are simultaneously accessible via a clean right-click context menu and direct keyboard shortcuts.
 
 ---
 
@@ -50,7 +50,7 @@ Opens the inline coding agent composer directly above the selection, allowing yo
 
 When reviewing changes in the split (side-by-side) git diff viewer, selecting code on either the left (original `HEAD`) or right (working tree) side requires special care. Traditional editors sweep up line numbers, diff markers (`+`/`-`), and column gutters into the clipboard.
 
-env0 automatically normalizes diff selections:
+lx8 automatically normalizes diff selections:
 - Gutter line numbers and diff signs are cleanly excluded.
 - The selected text is accurately mapped to working-tree coordinates.
 - Copying or dispatching an agent edit from a diff operates directly on the underlying files on disk.
@@ -78,5 +78,5 @@ Hovering a line number shows a thread icon. Clicking it opens the same menu as a
 
 ## Non-Intrusive Ergonomics
 
-- **No Code Occlusion**: Floating toolbars often pop up directly over the line above or below your selection, hiding the very code you are trying to read. env0 mounts action buttons in the bottom status bar, leaving the editor viewport 100% unobstructed.
+- **No Code Occlusion**: Floating toolbars often pop up directly over the line above or below your selection, hiding the very code you are trying to read. lx8 mounts action buttons in the bottom status bar, leaving the editor viewport 100% unobstructed.
 - **Automatic State Restoration**: As soon as you click elsewhere or collapse the selection, the status bar smoothly restores normal file coordinates, line/column counters, and Git branch details.

@@ -3789,5 +3789,5 @@ body.hide-git-gutter .g-git, body.hide-git-gutter [class*="git-"] { display: non
   color: var(--fg);
   white-space: nowrap;
 }
-.wordmark-zero { color: var(--accent); }
+.wordmark-eight { color: var(--accent); }
 .empty-logo .wordmark { font-size: 34px; letter-spacing: -.01em; }

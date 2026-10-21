@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <base href="/">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>env0 workbench</title>
+<title>lx8 workbench</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%237aa2f7%22%2F%3E%3Cpath%20d%3D%22M9%2011h14M9%2016h10M9%2021h6%22%20stroke%3D%22%231a1b26%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E">
 <link rel="icon" type="image/x-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%237aa2f7%22%2F%3E%3Cpath%20d%3D%22M9%2011h14M9%2016h10M9%2021h6%22%20stroke%3D%22%231a1b26%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="static/themes.css">
 <link rel="stylesheet" href="static/workbench.css">
 </head>
-<!-- The workbench: what a bare `env0` opens. web/src/workbench.js drives it
+<!-- The workbench: what a bare `lx8` opens. web/src/workbench.js drives it
      (bundled to static/workbench.js); the server side is workbench.go. -->
 <body class="wb">
 <div id="wb-app">
@@ -22,7 +22,7 @@
     <main class="wb-main">
       <header class="wb-hero">
         <div class="empty-logo">
-            <span class="wordmark">env<span class="wordmark-zero">0</span></span>
+            <span class="wordmark">lx<span class="wordmark-eight">8</span></span>
         </div>
         <p class="wb-tagline">Open a folder or a pull request to review.</p>
       </header>
@@ -43,7 +43,7 @@
            always worktrees of one clone (workbench_clone.go). -->
       <section id="wb-clone" class="wb-clone" hidden>
         <p class="wb-clone-head">No local clone of <b id="wb-clone-repo"></b> found.</p>
-        <p class="wb-faint">Pull requests open as git worktrees of a clone of their repository, so nothing is cloned twice. Point env0 at your clone, or let it make one.</p>
+        <p class="wb-faint">Pull requests open as git worktrees of a clone of their repository, so nothing is cloned twice. Point lx8 at your clone, or let it make one.</p>
         <form id="wb-clone-form" class="wb-open" autocomplete="off">
           <div class="wb-field">
             <input id="wb-clone-path" type="text" spellcheck="false" autocapitalize="off" placeholder="~/path/to/your/clone"
@@ -53,7 +53,7 @@
           <button type="submit" class="wb-btn wb-primary">Use this clone</button>
         </form>
         <p class="wb-clone-actions">
-          <button id="wb-clone-managed" type="button" class="wb-btn">Let env0 clone it</button>
+          <button id="wb-clone-managed" type="button" class="wb-btn">Let lx8 clone it</button>
           <span id="wb-clone-dest" class="wb-faint wb-clone-dest"></span>
           <button id="wb-clone-cancel" type="button" class="wb-btn">Cancel</button>
         </p>
@@ -94,10 +94,10 @@
   <!-- Same status bar as the app: logo and version, then the CPU · RAM · LSP
        chip, here summed over the workbench and every running workspace. -->
   <footer id="status" class="wb-status">
-    <a class="side-logo" href="https://github.com/LancemDev/env0" target="_blank" rel="noopener" title="env0.ai">
-            <span class="wordmark">env<span class="wordmark-zero">0</span></span>
+    <a class="side-logo" href="https://github.com/LancemDev/lx8" target="_blank" rel="noopener" title="lx8 on GitHub">
+            <span class="wordmark">lx<span class="wordmark-eight">8</span></span>
     </a>
-    <span id="st-ver" class="status-ver" title="env0 version"></span>
+    <span id="st-ver" class="status-ver" title="lx8 version"></span>
     <span class="status-sep"></span>
     <span id="st-running"></span>
     <span class="grow"></span>
@@ -111,7 +111,7 @@
       </span>
     </span>
     <span class="side-actions">
-      <a class="mini" href="https://github.com/LancemDev/env0" target="_blank" rel="noopener" title="env0 on GitHub" aria-label="env0 on GitHub">
+      <a class="mini" href="https://github.com/LancemDev/lx8" target="_blank" rel="noopener" title="lx8 on GitHub" aria-label="lx8 on GitHub">
         <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
       </a>
       <button class="mini" id="btn-theme" title="Select theme" aria-label="Select theme" aria-haspopup="listbox">

@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// env0 is built around one job: keeping a project's .env files correct without
+// lx8 is built around one job: keeping a project's .env files correct without
 // ever leaving the browser. This file owns the .env format itself -- how a
 // file is split into entries, how an entry is rendered back, and how the
 // workspace is searched for .env files.

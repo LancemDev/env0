@@ -1,7 +1,7 @@
 package main
 
 import (
-	iign "env0/internal/ignore"
+	iign "lx8/internal/ignore"
 )
 
 type ruleKind = iign.RuleKind

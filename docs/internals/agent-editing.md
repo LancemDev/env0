@@ -1,27 +1,27 @@
 # Harness Editing & Agent Dispatch
 
-This document describes the design and implementation of env0's editing flow:
+This document describes the design and implementation of lx8's editing flow:
 
 - dispatch and change detection: [`agent.go`](../../agent.go)
 - the persisted harness choice: [`settings.go`](../../settings.go)
 - the instruction composers and footer controls: [`web/src/agent.js`](../../web/src/agent.js)
 - the selection bar and right-click menu that start an edit: [`web/src/selbar.js`](../../web/src/selbar.js)
 
-Harnesses are discovered automatically, the same way language servers are. Editing becomes available as soon as env0 finds one installed, but nothing ever runs until the user picks one, and that choice is remembered between runs. `-no-agent` removes the feature entirely; `-agent` pins a harness for scripted use and takes the choice away from the UI.
+Harnesses are discovered automatically, the same way language servers are. Editing becomes available as soon as lx8 finds one installed, but nothing ever runs until the user picks one, and that choice is remembered between runs. `-no-agent` removes the feature entirely; `-agent` pins a harness for scripted use and takes the choice away from the UI.
 
 > Inline and batch edits now run as [threads](threads.md). `/api/agent/edit` and `/api/agent/batch` call `threadManager.StartEdit`, which creates a thread (kind `edit` or `batch`), runs the first turn through the same harness argv, and returns an `agentJob`-shaped snapshot. `agentManager.Job` and `CancelJob` consult the thread manager through hooks, so `/api/agent/job` and `/api/agent/cancel` and the browser's polling are unchanged. The overlap guard in section 5 is enforced by `threadManager.overlappingEdit`, against running inline and batch edits only. `Start`, `StartBatch` and `run` remain for `StartPrompt` (commit messages).
 
 ## 1. The Dispatcher Model
 
-env0 does not author agent changes. The harness flow sends no file content; it composes a prompt and reloads whatever the harness wrote. (Direct typing in the browser is a separate path, see [File Editing](file-editing.md).)
+lx8 does not author agent changes. The harness flow sends no file content; it composes a prompt and reloads whatever the harness wrote. (Direct typing in the browser is a separate path, see [File Editing](file-editing.md).)
 
 Editing works by delegation:
 
 1. The user selects a range, in the code view or the diff view, and writes an instruction anchored to it.
-2. env0 composes a prompt from that instruction plus the referenced source.
-3. env0 spawns a coding harness already installed on the machine, with the workspace as its working directory.
+2. lx8 composes a prompt from that instruction plus the referenced source.
+3. lx8 spawns a coding harness already installed on the machine, with the workspace as its working directory.
 4. The harness makes the change.
-5. env0 works out what moved and reloads it in place.
+5. lx8 works out what moved and reloads it in place.
 
 Several edits can be in flight at once, each dispatched from its own composer box, as long as their line ranges don't overlap (section 5).
 
@@ -30,7 +30,7 @@ sequenceDiagram
     autonumber
     participant U as User
     participant UI as Browser (agent.js)
-    participant S as env0 server (agent.go)
+    participant S as lx8 server (agent.go)
     participant H as Harness (claude, gemini, ...)
     participant G as git CLI
 
@@ -91,8 +91,8 @@ The chosen harness and its model are directly selectable in the compose box's me
 The choice is written to:
 
 ```
-$XDG_CONFIG_HOME/env0/settings.json     # when XDG_CONFIG_HOME is set
-~/.env0/settings.json                   # otherwise
+$XDG_CONFIG_HOME/lx8/settings.json     # when XDG_CONFIG_HOME is set
+~/.lx8/settings.json                   # otherwise
 ```
 
 ```json
@@ -101,7 +101,7 @@ $XDG_CONFIG_HOME/env0/settings.json     # when XDG_CONFIG_HOME is set
 }
 ```
 
-This follows `stateFilePath` in [`update.go`](../../update.go). env0 never writes its own state into a working tree: there is no `.env0/` directory in the repository.
+This follows `stateFilePath` in [`update.go`](../../update.go). lx8 never writes its own state into a working tree: there is no `.lx8/` directory in the repository.
 
 A corrupt or stale settings file is never an error. If the saved harness has since been uninstalled it simply resolves to nothing selected, and the picker appears again.
 
@@ -122,15 +122,15 @@ Every supported harness starts an interactive session by default and blocks on a
 | `aider` | `claude-3-7-sonnet` | `aider --yes-always --no-auto-commits --model claude-3-7-sonnet --message {prompt}` |
 | `goose` | `gpt-4o` | `goose run --no-session --model gpt-4o -t {prompt}` |
 
-By default, env0 uses the least capable (fastest and cheapest) model from each harness's available model list, while letting users choose any available model from the harness menu or picker.
+By default, lx8 uses the least capable (fastest and cheapest) model from each harness's available model list, while letting users choose any available model from the harness menu or picker.
 
 A full command template is accepted anywhere a harness name is, and must contain `{prompt}`:
 
 ```bash
-env0 -agent "claude -p --permission-mode acceptEdits {prompt}"
+lx8 -agent "claude -p --permission-mode acceptEdits {prompt}"
 ```
 
-The template is split on whitespace, and `{prompt}` is substituted inside each token, so both `{prompt}` and `--prompt={prompt}` work. Presets are a convenience, not a coupling: because a template is always available, a harness that changes its flags is a one-line fix by the user rather than a env0 release.
+The template is split on whitespace, and `{prompt}` is substituted inside each token, so both `{prompt}` and `--prompt={prompt}` work. Presets are a convenience, not a coupling: because a template is always available, a harness that changes its flags is a one-line fix by the user rather than a lx8 release.
 
 The binary is resolved before a harness can be selected, so a typo or an uninstalled tool fails at the point of choosing rather than on first use.
 
@@ -140,7 +140,7 @@ The binary is resolved before a harness can be selected, so a typo or an uninsta
 
 ### Real-Time Streaming and Output
 
-As the harness runs, lines from stdout and stderr are streamed in real time to the terminal stdout where env0 is running (`lineStreamer`), prefixed with `[<harness>]` so the developer can see exactly what the model is thinking, doing, and editing as it happens.
+As the harness runs, lines from stdout and stderr are streamed in real time to the terminal stdout where lx8 is running (`lineStreamer`), prefixed with `[<harness>]` so the developer can see exactly what the model is thinking, doing, and editing as it happens.
 
 Stdout and stderr are simultaneously buffered into `tailBuffer`s for the `/api/agent/job` polling API.
 
@@ -182,7 +182,7 @@ The frontend's `reloadWorkspace()` then reloads in dependency order: `/api/reind
 
 ### No File Watcher
 
-env0 dispatched the harness, so it knows when the work ended. Completion is detected by the process exiting, not by watching the filesystem. There is no `fsnotify` dependency, no polling of the tree, and the single-binary, zero-dependency footprint is unchanged.
+lx8 dispatched the harness, so it knows when the work ended. Completion is detected by the process exiting, not by watching the filesystem. There is no `fsnotify` dependency, no polling of the tree, and the single-binary, zero-dependency footprint is unchanged.
 
 ## 8. HTTP Surface
 
@@ -224,9 +224,9 @@ Every mutating endpoint is guarded by `localPost` ([`lspsetup.go`](../../lspsetu
 
 ### Security Posture
 
-The edit endpoint runs a general-purpose coding agent with shell access as the user who started env0. `localPost` restricts it to env0's own page reached by IP address or `localhost`. That shuts out other websites and DNS rebinding, and makes editing unavailable through the hostname-based tunnels and reverse proxies described in the README. It is not authentication: with `-host 0.0.0.0`, anyone who can reach env0 by IP, for example over Tailscale, can dispatch an edit. Exposing editing beyond a trusted network requires an authentication story env0 does not yet have.
+The edit endpoint runs a general-purpose coding agent with shell access as the user who started lx8. `localPost` restricts it to lx8's own page reached by IP address or `localhost`. That shuts out other websites and DNS rebinding, and makes editing unavailable through the hostname-based tunnels and reverse proxies described in the README. It is not authentication: with `-host 0.0.0.0`, anyone who can reach lx8 by IP, for example over Tailscale, can dispatch an edit. Exposing editing beyond a trusted network requires an authentication story lx8 does not yet have.
 
-The explicit first-run pick matters for the same reason. Auto-enabling on discovery would mean any env0 instance on a machine with a harness installed is a code execution endpoint that nobody opted into.
+The explicit first-run pick matters for the same reason. Auto-enabling on discovery would mean any lx8 instance on a machine with a harness installed is a code execution endpoint that nobody opted into.
 
 ## 9. Limits
 

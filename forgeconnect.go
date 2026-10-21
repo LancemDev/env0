@@ -36,8 +36,8 @@ func (s *Server) forgeTarget() (GitProvider, PRTarget, bool) {
 	return p, PRTarget{Provider: p.Name(), Host: remoteHost(remote)}, true
 }
 
-// forgeMeta names the forge, whether env0 has a token for it (and from
-// where), and how to get one. nil when the workspace has no forge env0 knows.
+// forgeMeta names the forge, whether lx8 has a token for it (and from
+// where), and how to get one. nil when the workspace has no forge lx8 knows.
 func (s *Server) forgeMeta() map[string]any {
 	p, target, ok := s.forgeTarget()
 	if !ok {
@@ -85,7 +85,7 @@ func (s *Server) handleForgeConnect(w http.ResponseWriter, r *http.Request) {
 	token, extra := strings.TrimSpace(body.Token), strings.TrimSpace(body.Extra)
 	provider, target, ok := s.forgeTarget()
 	if !ok {
-		fail(w, http.StatusBadRequest, "this workspace's remote isn't on a forge env0 knows")
+		fail(w, http.StatusBadRequest, "this workspace's remote isn't on a forge lx8 knows")
 		return
 	}
 	info, setup := provider.Info(), provider.TokenSetup(target.Host)

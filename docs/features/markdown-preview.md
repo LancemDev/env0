@@ -1,6 +1,6 @@
 # Rendered Markdown Preview
 
-env0 features a built-in, rendered Markdown preview engine. When opening any `.md` or `.markdown` file, env0 renders it as a clean, formatted article by default, with an instant toggle (`Alt+M`) to switch between rendered view and raw source code while preserving your exact reading position.
+lx8 features a built-in, rendered Markdown preview engine. When opening any `.md` or `.markdown` file, lx8 renders it as a clean, formatted article by default, with an instant toggle (`Alt+M`) to switch between rendered view and raw source code while preserving your exact reading position.
 
 ---
 
@@ -8,7 +8,7 @@ env0 features a built-in, rendered Markdown preview engine. When opening any `.m
 
 Modern software projects rely heavily on Markdown for documentation, design proposals, architecture specifications, API contracts, and user guides. Reading complex Markdown files in raw text—with unrendered tables, nested link URLs, footnote references, and raw alert tags—creates unnecessary cognitive fatigue.
 
-env0 provides a native Markdown preview engine that renders formatted typography, interactive tables, task lists, and syntax-highlighted code blocks directly in the browser. It keeps preview and source synchronized: toggling between preview and source preserves your scroll location, and clicking code block copy buttons allows you to extract snippet code with a single click.
+lx8 provides a native Markdown preview engine that renders formatted typography, interactive tables, task lists, and syntax-highlighted code blocks directly in the browser. It keeps preview and source synchronized: toggling between preview and source preserves your scroll location, and clicking code block copy buttons allows you to extract snippet code with a single click.
 
 ---
 
@@ -22,7 +22,7 @@ env0 provides a native Markdown preview engine that renders formatted typography
   - `[!WARNING]`: Yellow/amber callout noting breaking changes or potential issues.
   - `[!CAUTION]`: Red callout warning against dangerous operations or data risks.
 - **Syntax-Highlighted Code Fences**: Code blocks inside Markdown files are tokenized with native language highlighting matching your active workbench theme, complete with language badges and one-click copy buttons.
-- **Mermaid Diagrams**: Fenced `mermaid` blocks render as theme-aware diagrams. The runtime loads on demand over same-origin (cached locally under `~/.env0/cache/vendor/`) only when needed, provides full-screen maximize and zoom/pan controls, preserves the original definition for copying, and falls back to readable source when a diagram is invalid.
+- **Mermaid Diagrams**: Fenced `mermaid` blocks render as theme-aware diagrams. The runtime loads on demand over same-origin (cached locally under `~/.lx8/cache/vendor/`) only when needed, provides full-screen maximize and zoom/pan controls, preserves the original definition for copying, and falls back to readable source when a diagram is invalid.
 - **Bi-Directional Scroll Synchronization**: Switching between preview and source code (`Alt+M`) translates your viewport position seamlessly so you never lose your place.
 - **Deep Anchor Linking**: Supports internal anchor links (`#heading-name`) and source line coordinates (`#L42`), enabling smooth navigation within documents and between project files.
 - **Browser-Side Security Sanitization**: Every rendered HTML element passes through an inert DOM sanitizer allowlist that eliminates any risk of script injection, dangerous protocol schemes, or CSS overlay exploits when previewing untrusted repositories.
