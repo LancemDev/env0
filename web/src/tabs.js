@@ -189,6 +189,10 @@ export async function openFile(path, opts = {}) {
   S.lsp.server = (d.lsp && d.lsp.server) || '';
   S.lsp.missing = (d.lsp && d.lsp.missing) || '';
   warmLSP(d);
+  // Decide which view is on screen before measuring: the code viewport may
+  // still be hidden behind the previous tab's .env editor, and a hidden
+  // viewport measures zero wide and cannot be scrolled.
+  syncEditUI();
   drawTabs(); drawCrumbs(); layout();
 
   if (line) {
@@ -198,7 +202,6 @@ export async function openFile(path, opts = {}) {
   } else if (!d.diffMode) {
     vp.scrollTop = d.scrollTop;
   }
-  syncEditUI();
   render();
   updateStatus();
   if ($('#panel-outline')?.classList.contains('active')) loadOutline();

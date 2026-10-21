@@ -333,4 +333,13 @@ export function refineChunk(d, c, delay = 800, tries = 0) {
 export function initRenderer() {
   vp.addEventListener('scroll', render, { passive: true });
   new ResizeObserver(() => { layout(); render(); }).observe(editor);
+  // The viewport is hidden behind the .env editor, the text editor and the
+  // previews, and anything laid out while it was hidden was measured at zero
+  // width. Lay it out again whenever it comes back.
+  let vpWidth = 0;
+  new ResizeObserver(() => {
+    const w = vp.clientWidth;
+    if (w && w !== vpWidth) { layout(); render(); }
+    vpWidth = w;
+  }).observe(vp);
 }
