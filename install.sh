@@ -83,10 +83,23 @@ fetch() {
 fetch_file() {
   url="$1"
   out="$2"
+  # No overall time limit: a slow connection is not a failure. A download
+  # only gives up when it has stalled (under 1 KB/s for 60 seconds). On a
+  # terminal it shows a progress bar, so a slow download never looks hung.
   if command -v curl >/dev/null 2>&1; then
-    curl -fsSL --connect-timeout 10 --max-time 300 --retry 2 -o "$out" "$url"
+    if [ -t 2 ]; then
+      curl -fL --progress-bar --connect-timeout 15 --speed-limit 1024 --speed-time 60 \
+        --retry 3 --retry-delay 2 -C - -o "$out" "$url"
+    else
+      curl -fsSL --connect-timeout 15 --speed-limit 1024 --speed-time 60 \
+        --retry 3 --retry-delay 2 -o "$out" "$url"
+    fi
   elif command -v wget >/dev/null 2>&1; then
-    wget -q -T 30 -t 3 -O "$out" "$url"
+    if [ -t 2 ]; then
+      wget -q --show-progress -T 60 -t 3 -c -O "$out" "$url"
+    else
+      wget -q -T 60 -t 3 -O "$out" "$url"
+    fi
   fi
 }
 
@@ -215,10 +228,12 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 log_step "Downloading ${BINARY_NAME}..."
 TMP_FILE="${TMP_DIR}/lx8"
 
-if ! fetch_file "$DOWNLOAD_URL" "$TMP_FILE" 2>/dev/null; then
-  if ! fetch_file "$FALLBACK_URL" "$TMP_FILE" 2>/dev/null; then
+if ! fetch_file "$DOWNLOAD_URL" "$TMP_FILE"; then
+  rm -f "$TMP_FILE"
+  if ! fetch_file "$FALLBACK_URL" "$TMP_FILE"; then
     log_error "Failed to download binary from $DOWNLOAD_URL"
-    log_warn "If this version is newly tagged, the GitHub Action release build may still be compiling."
+    log_warn "Check your connection and run the installer again."
+    log_warn "If v${VERSION} was tagged in the last few minutes, its release may still be building."
     exit 1
   fi
 fi
